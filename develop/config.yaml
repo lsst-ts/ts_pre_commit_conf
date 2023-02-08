@@ -1,0 +1,11 @@
+configuration_files:
+  - ".flake8"
+  - ".isort.cfg"
+  - ".mypy.ini"
+  - ".pre-commit-config.yaml"
+repository: https://github.com/lsst-ts/ts_pre_commit_conf/
+branch: develop
+update_gitignore: True
+path: "develop"
+gitignore_info_text:
+  "# Configuration file added automatically by 'centralized-pre-commit-conf'."
