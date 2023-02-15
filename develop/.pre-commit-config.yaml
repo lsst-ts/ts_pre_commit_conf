@@ -22,7 +22,7 @@ repos:
         name: isort (python)
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 1.0.0
+    rev: v1.0.0
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML==6.0.12.2]

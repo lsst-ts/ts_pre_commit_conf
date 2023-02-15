@@ -15,12 +15,12 @@ To enable this:
 * Install centralized-pre-commit-conf, for instance ``conda install -y -c lsstts centralized-pre-commit-conf``.
 * Then either:
 
-    * Download the ``config.yaml`` file of your choice from the ``develop`` directory in the ``develop`` branch on ``https://github.com/lsst-ts/ts_pre_commit_conf/`` and place it in ``~/.config/pre-commit-conf`` on UNIX systems (Linux and macOS).
+    * Download the ``config.yaml`` file from the ``develop`` directory in the ``develop`` branch on ``https://github.com/lsst-ts/ts_pre_commit_conf/`` and place it in ``~/.config/pre-commit-conf`` on UNIX systems (Linux and macOS).
     * Run ``pre-commit-conf -f`` once in every project to download the configuration files for pre-commit and add them to ``.gitignore``.
 
   OR
 
-    * Download the configuration files using ``pre-commit-conf -f -r "https://github.com/lsst-ts/ts_pre_commit_conf/" -b "develop" -u -p "develop" -c .flake8 .isort.cfg .mypy.ini .pre-commit-config.yaml``.
+    * Download the configuration files using ``pre-commit-conf -f -r "https://raw.githubusercontent.com//lsst-ts/ts_pre_commit_conf/" -b "develop" -u -p "develop" -c .flake8 .isort.cfg .mypy.ini .pre-commit-config.yaml``
 
 Note that the ``develop`` directory and the ``-p "develop"`` command line argument are referring to the same path in the ``ts_pre_commit_conf`` repo.
 Other directories may be available as well.
