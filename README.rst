@@ -22,11 +22,12 @@ To enable this:
 
     * Download the configuration files using ``pre-commit-conf -f -r "https://raw.githubusercontent.com//lsst-ts/ts_pre_commit_conf/" -b "develop" -u -p "develop" -c .flake8 .isort.cfg .mypy.ini .pre-commit-config.yaml``
 
-Note that the ``develop`` directory and the ``-p "develop"`` command line argument are referring to the same path in the ``ts_pre_commit_conf`` repo.
+The ``develop`` directory and the ``-p "develop"`` command line argument are referring to the same path in the ``ts_pre_commit_conf`` repo.
 Other directories may be available as well.
 The ``-b "develop"`` command line argument refers to the branch in the ``ts_pre_commit_conf`` repo.
 For developers actively helping to maintain the configuration files, other branches can be used to pull the configuration files for testing purposes.
-It is not recommended to use a different branch for other projects!
+
+Note that for projects not using mypy, the ``develop_without_mypy`` directory should be used instead!
 
 For more information about the use of the ``pre-commit-conf`` command, see the `centralized-pre-commit-conf <https://github.com/Pierre-Sassoulas/centralized-pre-commit-conf/>`_ homepage.
 The ``appropriate search paths`` link on that page is wrong and should point `here <https://confuse.readthedocs.io/en/latest/usage.html#search-paths>`_.
