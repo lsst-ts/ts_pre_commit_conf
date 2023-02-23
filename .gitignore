@@ -1,3 +1,21 @@
 # Editors
 .idea
 .vscode
+
+# Built by sconsUtils
+version.py
+
+# Pytest
+tests/.tests
+pytest_session.txt
+.cache/
+.pytest_cache
+.coverage
+
+# Python cache
+__pycache__/
+
+.flake8
+.isort.cfg
+.mypy.ini
+.pre-commit-config.yaml
