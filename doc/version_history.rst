@@ -6,6 +6,12 @@
 Version History
 ###############
 
+v0.2.0
+======
+
+* Remove the ``--no-isort`` command line option.
+
+
 v0.1.0
 ======
 

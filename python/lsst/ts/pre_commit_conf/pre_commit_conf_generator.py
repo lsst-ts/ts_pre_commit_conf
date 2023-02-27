@@ -88,14 +88,6 @@ def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
     )
 
     parser.add_argument(
-        "--no-isort",
-        action="store_true",
-        default=False,
-        help="Generate a pre-commit configuration file without isort "
-        "(default: False, meaning isort gets included).",
-    )
-
-    parser.add_argument(
         "--no-mypy",
         action="store_true",
         default=False,
@@ -150,9 +142,6 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
     dest = _get_dest(args=args)
     with open(PRE_COMMIT_CONFIG_TEMPLATE) as f:
         pre_commit_config = f.read()
-    if "no_isort" not in vars(args) or args.no_isort is False:
-        with open(ISORT_PRE_COMMIT_HOOK_TEMPLATE) as f:
-            pre_commit_config = pre_commit_config + f.read()
     if "no_mypy" not in vars(args) or args.no_mypy is False:
         with open(MYPY_PRE_COMMIT_HOOK_TEMPLATE) as f:
             pre_commit_config = pre_commit_config + f.read()
@@ -172,8 +161,7 @@ def copy_config_files(args: types.SimpleNamespace) -> None:
     """
     dest = _get_dest(args=args)
     shutil.copy(FLAKE8_CONFIG_FILE, dest)
-    if "no_isort" not in vars(args) or args.no_isort is False:
-        shutil.copy(ISORT_CONFIG_FILE, dest)
+    shutil.copy(ISORT_CONFIG_FILE, dest)
     if "no_mypy" not in vars(args) or args.no_mypy is False:
         shutil.copy(MYPY_CONFIG_FILE, dest)
 
@@ -202,9 +190,7 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
         if FLAKE8_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{FLAKE8_CONFIG_FILE_NAME}\n")
-        if (
-            "no_isort" not in vars(args) or args.no_isort is False
-        ) and ISORT_CONFIG_FILE_NAME not in dot_gitignore_contents:
+        if ISORT_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{ISORT_CONFIG_FILE_NAME}\n")
         if (
             "no_mypy" not in vars(args) or args.no_mypy is False
