@@ -46,16 +46,10 @@ DATA_DIR = ROOT.resolve().parents[0] / "data"
 
 # pre-commit config files for validation.
 PRE_COMMIT_CONF_COMPLETE = DATA_DIR / "pre_commit_conf_complete.yaml"
-PRE_COMMIT_CONF_WITHOUT_ISORT = DATA_DIR / "pre_commit_conf_without_isort.yaml"
-PRE_COMMIT_CONF_WITHOUT_ISORT_AND_MYPY = (
-    DATA_DIR / "pre_commit_conf_without_isort_and_mypy.yaml"
-)
 PRE_COMMIT_CONF_WITHOUT_MYPY = DATA_DIR / "pre_commit_conf_without_mypy.yaml"
 
 # .gitignore files for validation.
 DOT_GITIGNORE_COMPLETE = DATA_DIR / "dot_gitignore_complete"
-DOT_GITIGNORE_WITHOUT_ISORT = DATA_DIR / "dot_gitignore_without_isort"
-DOT_GITIGNORE_WITHOUT_ISORT_AND_MYPY = DATA_DIR / "dot_gitignore_without_isort_and_mypy"
 DOT_GITIGNORE_WITHOUT_MYPY = DATA_DIR / "dot_gitignore_without_mypy"
 
 logging.basicConfig(
@@ -66,35 +60,15 @@ logging.basicConfig(
 class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_parse_args_no_command_line_args(self) -> None:
         args = parse_args(command_line_args=[])
-        assert args.no_isort is False
-        assert args.no_mypy is False
-        assert args.dest == "."
-
-        args = parse_args(command_line_args=["--no-isort"])
-        assert args.no_isort is True
         assert args.no_mypy is False
         assert args.dest == "."
 
         args = parse_args(command_line_args=["--no-mypy"])
-        assert args.no_isort is False
         assert args.no_mypy is True
         assert args.dest == "."
 
         args = parse_args(command_line_args=["--dest", "/tmp"])
-        assert args.no_isort is False
         assert args.no_mypy is False
-        assert args.dest == "/tmp"
-
-        args = parse_args(command_line_args=["--no-isort", "--no-mypy"])
-        assert args.no_isort is True
-        assert args.no_mypy is True
-        assert args.dest == "."
-
-        args = parse_args(
-            command_line_args=["--no-isort", "--no-mypy", "--dest", "/tmp"]
-        )
-        assert args.no_isort is True
-        assert args.no_mypy is True
         assert args.dest == "/tmp"
 
     def validate_pre_commit_conf(
@@ -111,7 +85,6 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             included in the .pre-commit-config.yaml file. Currently supported
             are
 
-                * no_isort
                 * no_mypy
         """
         args = types.SimpleNamespace()
@@ -134,32 +107,14 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
 
     async def test_generate_pre_commit_conf(self) -> None:
         # Nominal cases where all pre-commit hooks are included.
-        for kwargs in (
-            dict(),
-            dict(no_isort=False),
-            dict(no_mypy=False),
-            dict(no_isort=False, no_mypy=False),
-        ):
+        for kwargs in (dict(), dict(no_mypy=False)):
             self.validate_pre_commit_conf(
                 expected_conf_file=PRE_COMMIT_CONF_COMPLETE, **kwargs  # type: ignore
             )
 
-        # Exclude isort.
-        self.validate_pre_commit_conf(
-            expected_conf_file=PRE_COMMIT_CONF_WITHOUT_ISORT,
-            no_isort=True,
-        )
-
         # Exclude mypy.
         self.validate_pre_commit_conf(
             expected_conf_file=PRE_COMMIT_CONF_WITHOUT_MYPY,
-            no_mypy=True,
-        )
-
-        # Exclude isort and mypy.
-        self.validate_pre_commit_conf(
-            expected_conf_file=PRE_COMMIT_CONF_WITHOUT_ISORT_AND_MYPY,
-            no_isort=True,
             no_mypy=True,
         )
 
@@ -178,7 +133,6 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             Boolean values that indicate whether certain config file should be
             copied or not. Currently supported are
 
-                * no_isort
                 * no_mypy
         """
         args = types.SimpleNamespace()
@@ -210,12 +164,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
 
     async def test_copy_config_files(self) -> None:
         # Nominal cases where all pre-commit hooks are included.
-        for kwargs in (
-            dict(),
-            dict(no_isort=False),
-            dict(no_mypy=False),
-            dict(no_isort=False, no_mypy=False),
-        ):
+        for kwargs in (dict(), dict(no_mypy=False)):
             expected_conf_files = [
                 FLAKE8_CONFIG_FILE,
                 ISORT_CONFIG_FILE,
@@ -225,25 +174,10 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                 expected_conf_files=expected_conf_files, **kwargs  # type: ignore
             )
 
-        # Exclude isort.
-        expected_conf_files = [FLAKE8_CONFIG_FILE, MYPY_CONFIG_FILE]
-        self.validate_config_files(
-            expected_conf_files=expected_conf_files,
-            no_isort=True,
-        )
-
         # Exclude mypy.
         expected_conf_files = [FLAKE8_CONFIG_FILE, ISORT_CONFIG_FILE]
         self.validate_config_files(
             expected_conf_files=expected_conf_files,
-            no_mypy=True,
-        )
-
-        # Exclude isort and mypy.
-        expected_conf_files = [FLAKE8_CONFIG_FILE]
-        self.validate_config_files(
-            expected_conf_files=expected_conf_files,
-            no_isort=True,
             no_mypy=True,
         )
 
@@ -260,7 +194,6 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             Boolean values that indicate whether certain options should be
             included in the .gitignore file. Currently supported are
 
-                * no_isort
                 * no_mypy
         """
         args = types.SimpleNamespace()
@@ -280,32 +213,9 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             assert generated_dot_gitignore == expected_dot_gitignore
 
     async def test_update_dot_gitignore(self) -> None:
-        # Nominal cases where all pre-commit hooks are included.
-        for kwargs in (
-            dict(),
-            dict(no_isort=False),
-            dict(no_mypy=False),
-            dict(no_isort=False, no_mypy=False),
-        ):
+        # Nominal cases where all pre-commit hooks are included. Note that the
+        # MyPy config file name always gets added.
+        for kwargs in (dict(), dict(no_mypy=False), dict(no_mypy=True)):
             self.validate_dot_gitignore(
                 expected_dot_gitignore_file=DOT_GITIGNORE_COMPLETE, **kwargs  # type: ignore
             )
-
-        # Exclude isort.
-        self.validate_dot_gitignore(
-            expected_dot_gitignore_file=DOT_GITIGNORE_WITHOUT_ISORT,
-            no_isort=True,
-        )
-
-        # Exclude mypy.
-        self.validate_dot_gitignore(
-            expected_dot_gitignore_file=DOT_GITIGNORE_WITHOUT_MYPY,
-            no_mypy=True,
-        )
-
-        # Exclude isort and mypy.
-        self.validate_dot_gitignore(
-            expected_dot_gitignore_file=DOT_GITIGNORE_WITHOUT_ISORT_AND_MYPY,
-            no_isort=True,
-            no_mypy=True,
-        )

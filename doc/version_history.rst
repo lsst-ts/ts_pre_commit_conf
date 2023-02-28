@@ -6,6 +6,13 @@
 Version History
 ###############
 
+v0.2.0
+======
+
+* Remove the ``--no-isort`` command line option.
+* Make sure that the MyPy config file name always gets added .gitignore.
+
+
 v0.1.0
 ======
 
