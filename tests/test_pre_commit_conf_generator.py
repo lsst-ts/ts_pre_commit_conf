@@ -213,14 +213,9 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             assert generated_dot_gitignore == expected_dot_gitignore
 
     async def test_update_dot_gitignore(self) -> None:
-        # Nominal cases where all pre-commit hooks are included.
-        for kwargs in (dict(), dict(no_mypy=False)):
+        # Nominal cases where all pre-commit hooks are included. Note that the
+        # MyPy config file name always gets added.
+        for kwargs in (dict(), dict(no_mypy=False), dict(no_mypy=True)):
             self.validate_dot_gitignore(
                 expected_dot_gitignore_file=DOT_GITIGNORE_COMPLETE, **kwargs  # type: ignore
             )
-
-        # Exclude mypy.
-        self.validate_dot_gitignore(
-            expected_dot_gitignore_file=DOT_GITIGNORE_WITHOUT_MYPY,
-            no_mypy=True,
-        )

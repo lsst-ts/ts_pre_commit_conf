@@ -192,9 +192,7 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
             f.write(f"{FLAKE8_CONFIG_FILE_NAME}\n")
         if ISORT_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{ISORT_CONFIG_FILE_NAME}\n")
-        if (
-            "no_mypy" not in vars(args) or args.no_mypy is False
-        ) and MYPY_CONFIG_FILE_NAME not in dot_gitignore_contents:
+        if MYPY_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{MYPY_CONFIG_FILE_NAME}\n")
 
 
