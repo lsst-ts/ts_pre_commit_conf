@@ -31,7 +31,13 @@ requirements:
     - python {{ python }}
     - setuptools_scm
     - setuptools
+    - tomlkit
+    - typer
+    - pyproject-flake8
   run:
     - python {{ python }}
     - setuptools
     - setuptools_scm
+    - tomlkit
+    - typer
+    - pyproject-flake8
