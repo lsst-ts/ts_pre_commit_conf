@@ -4,6 +4,7 @@ repos:
     hooks:
       - id: check-yaml
         exclude: conda/meta.yaml
+      - id: check-xml
 
   - repo: https://github.com/psf/black
     rev: 23.1.0

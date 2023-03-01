@@ -6,6 +6,12 @@
 Version History
 ###############
 
+v0.3.0
+======
+
+* Add the ``check-xml`` hook.
+
+
 v0.2.0
 ======
 
