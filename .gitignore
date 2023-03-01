@@ -1,17 +1,9 @@
-.sconsign.dblite
-config.log
-.sconf_temp
-*.o
-*.os
-*.so
-*.cfgc
-*.pyc
-*_wrap.cc
-*Lib.py
+# Editors
+.idea
+.vscode
 
 # Built by sconsUtils
 version.py
-bin/
 
 # Pytest
 tests/.tests
@@ -19,3 +11,11 @@ pytest_session.txt
 .cache/
 .pytest_cache
 .coverage
+
+# Python cache
+__pycache__/
+
+.flake8
+.isort.cfg
+.mypy.ini
+.pre-commit-config.yaml
