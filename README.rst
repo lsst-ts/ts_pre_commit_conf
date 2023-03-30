@@ -2,8 +2,7 @@
 ts_pre_commit_conf
 ##################
 
-``ts_pre_commit_conf`` is a tool to generate configuration files for the pre-commit hooks for the Telescope and Site SoftWare (TSSW) team at the Vera C. Rubin Observatory.
-
+``ts_pre_commit_conf`` is a tool to generate configuration files for the ``pre-commit`` hooks for the Telescope and Site SoftWare (TSSW) team at the Vera C. Rubin Observatory.
 
 These configuration files facilitate ``pre-commit`` to maintain ``black`` formatting, ``flake8`` compliance and ``isort`` imports sorting.
 If ``mypy`` is used, a configuration file can be generated for that as well.
@@ -12,9 +11,27 @@ Since TSSW uses ``conda`` (or ``mamba``) for their software installations, a con
 To enable this:
 
 * Install pre-commit, for instance ``conda install -y pre-commit``.
-* Install ``ts_pre_commit_conf``, for instance ``conda install -y -c lsstts ts-pre-commit-conf``.
+* Install ``ts_pre_commit_conf``, for instance ``conda install -y -c lsstts ts-pre-commit-config``.
 * Then execute the ``generate_pre_commit_conf`` command.
-  Note that this command accepts the ``-h`` or ``--help`` argument that will display usage information.
+
+In order for the ``generate_pre_commit_conf`` command to know which ``pre-commit`` hooks need to be applied, a ``.ts-pre-commit-config.yaml`` configuration file needs to be created.
+This ``.ts-pre-commit-config.yaml`` file contains information that indicates for every ``pre-commit`` whether it should be applied or not.
+The ``.ts-pre-commit-config.yaml`` configuration file can be generated using the ``generate_pre_commit_conf --create`` command, or manually.
+For more information on the command line options, use ``generate_pre_commit_conf --help``.
+An example where all ``pre-commit`` hooks are enabled is:
+
+.. code-block:: yaml
+
+   check-yaml: true
+   check-xml: true
+   black: true
+   flake8: true
+   isort: true
+   mypy: true
+
+The ``generate_pre_commit_conf`` command fails with a comprehensive error message if a mandatory or optional ``pre-commit`` hook is missing.
+All ``pre-commit`` hooks except for ``mypy`` are mandatory for TSSW projects, so those hooks need to be set to ``true``.
+Setting one or more of the mandatory hooks to ``false`` will make the ``generate_pre_commit_conf`` command fail with a comprehensive error message.
 
 The configuration files will be updated whenever the pre-commit hooks get updated.
 Apart from that, all generated configuration file names get added to ``.gitignore`` as well.

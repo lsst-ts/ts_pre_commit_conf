@@ -6,6 +6,13 @@
 Version History
 ###############
 
+v0.4.0
+======
+
+* Update versions of pre-commit hooks.
+* Rely on .ts_pre_commit_config.yaml for configuring the pre-commit hooks.
+
+
 v0.3.0
 ======
 
