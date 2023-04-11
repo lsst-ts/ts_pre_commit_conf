@@ -6,6 +6,12 @@
 Version History
 ###############
 
+v0.4.1
+======
+
+* Refer to the TSSW Developer Guide for usage instructions.
+
+
 v0.4.0
 ======
 
