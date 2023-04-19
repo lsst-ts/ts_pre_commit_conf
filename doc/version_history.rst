@@ -6,6 +6,13 @@
 Version History
 ###############
 
+v0.4.2
+======
+
+* Add Jenkinsfile for CI builds.
+* Add Jenkinsfile.conda for Conda builds.
+
+
 v0.4.1
 ======
 
