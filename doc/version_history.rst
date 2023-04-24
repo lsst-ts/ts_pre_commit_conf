@@ -6,6 +6,12 @@
 Version History
 ###############
 
+v0.4.3
+======
+
+* Update the version of mypy.
+
+
 v0.4.2
 ======
 
