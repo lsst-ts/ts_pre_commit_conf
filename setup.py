@@ -1,4 +1,4 @@
-# This file is part of ts_mtdome.
+# This file is part of ts_pre_commit_conf.
 #
 # Developed for the Vera Rubin Observatory Telescope and Site Systems.
 # This product includes software developed by the LSST Project
