@@ -30,6 +30,7 @@ from copy import copy
 import pytest
 import yaml
 from lsst.ts.pre_commit_conf.pre_commit_conf_generator import (
+    CLANG_FORMAT_CONFIG_FILE,
     FLAKE8_CONFIG_FILE,
     ISORT_CONFIG_FILE,
     MYPY_CONFIG_FILE,
@@ -248,7 +249,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             # Assert that the number of files in the destination directory
             # equals the number of expected files.
             dest_glob = pathlib.Path(tmpdirname).glob("**/*")
-            dest_files = [f for f in dest_glob]
+            dest_files = list(dest_glob)
             assert len(dest_files) == len(expected_conf_files)
 
             # Assert that the names and contents of the files in the
@@ -266,6 +267,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
         # Nominal cases where all pre-commit hooks are included.
         for kwargs in (dict(), dict(no_mypy=False)):
             expected_conf_files = [
+                CLANG_FORMAT_CONFIG_FILE,
                 FLAKE8_CONFIG_FILE,
                 ISORT_CONFIG_FILE,
                 MYPY_CONFIG_FILE,
@@ -275,7 +277,11 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             )
 
         # Exclude mypy.
-        expected_conf_files = [FLAKE8_CONFIG_FILE, ISORT_CONFIG_FILE]
+        expected_conf_files = [
+            CLANG_FORMAT_CONFIG_FILE,
+            FLAKE8_CONFIG_FILE,
+            ISORT_CONFIG_FILE,
+        ]
         self.validate_config_files(
             expected_conf_files=expected_conf_files,
             no_mypy=True,
