@@ -19,3 +19,4 @@ __pycache__/
 .isort.cfg
 .mypy.ini
 .pre-commit-config.yaml
+.clang-format

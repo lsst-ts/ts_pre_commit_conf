@@ -29,6 +29,8 @@ import yaml
 
 __all__ = [
     "DOT_GITIGNORE",
+    "CLANG_FORMAT_CONFIG_FILE_NAME",
+    "CLANG_FORMAT_CONFIG_FILE",
     "FLAKE8_CONFIG_FILE",
     "FLAKE8_CONFIG_FILE_NAME",
     "ISORT_CONFIG_FILE",
@@ -59,19 +61,20 @@ CONFIG_FILES_DIR = ROOT.resolve().parents[0] / "config_files"
 TEMPLATES_DIR = ROOT.resolve().parents[0] / "templates"
 
 # Config files for the pre-commit hooks.
+CLANG_FORMAT_CONFIG_FILE_NAME = ".clang-format"
 FLAKE8_CONFIG_FILE_NAME = ".flake8"
 ISORT_CONFIG_FILE_NAME = ".isort.cfg"
 MYPY_CONFIG_FILE_NAME = ".mypy.ini"
 PRE_COMMIT_CONFIG_FILE_NAME = ".pre-commit-config.yaml"
 
 # Config file paths for the pre-commit hooks.
+CLANG_FORMAT_CONFIG_FILE = CONFIG_FILES_DIR / CLANG_FORMAT_CONFIG_FILE_NAME
 TS_PRE_COMMIT_CONFIG_YAML_FILE = CONFIG_FILES_DIR / TS_PRE_COMMIT_CONFIG_YAML
 FLAKE8_CONFIG_FILE = CONFIG_FILES_DIR / FLAKE8_CONFIG_FILE_NAME
 ISORT_CONFIG_FILE = CONFIG_FILES_DIR / ISORT_CONFIG_FILE_NAME
 MYPY_CONFIG_FILE = CONFIG_FILES_DIR / MYPY_CONFIG_FILE_NAME
 
 # Template files.
-ISORT_PRE_COMMIT_HOOK_TEMPLATE = TEMPLATES_DIR / "isort-pre-commit-hook-template.yaml"
 MYPY_PRE_COMMIT_HOOK_TEMPLATE = TEMPLATES_DIR / "mypy-pre-commit-hook-template.yaml"
 PRE_COMMIT_CONFIG_TEMPLATE = TEMPLATES_DIR / "pre-commit-config-template.yaml"
 
@@ -79,7 +82,7 @@ DOT_GITIGNORE = ".gitignore"
 
 # Mandatory pre-commit hooks for TSSW.
 MANDATORY_PRE_COMMIT_HOOKS = frozenset(
-    ("check-yaml", "check-xml", "black", "flake8", "isort")
+    ("check-yaml", "check-xml", "black", "flake8", "isort", "clang-format")
 )
 
 # Optional pre-commit hooks for TSSW and the arg used for them.
@@ -189,6 +192,11 @@ def create_or_report_missing_config_file(args: types.SimpleNamespace) -> None:
             _create_config_file(args)
         else:
             _print_instructions_and_exit(args)
+    elif args.create is True:
+        print(
+            f"Config file {TS_PRE_COMMIT_CONFIG_YAML_FILE} already exists, no action performed."
+        )
+        sys.exit(1)
 
 
 def _create_config_file(args: types.SimpleNamespace) -> None:
@@ -204,14 +212,15 @@ def _create_config_file(args: types.SimpleNamespace) -> None:
     dest = _get_dest(args=args)
     print("Creating one now.")
     shutil.copy(TS_PRE_COMMIT_CONFIG_YAML_FILE, dest)
-    if args.no_mypy is True:
-        with open(dest / TS_PRE_COMMIT_CONFIG_YAML, "r") as f:
-            lines = f.read()
 
+    with open(dest / TS_PRE_COMMIT_CONFIG_YAML, "r") as f:
+        lines = f.read()
+
+    if args.no_mypy is True:
         lines = lines.replace("mypy: true", "mypy: false")
 
-        with open(dest / TS_PRE_COMMIT_CONFIG_YAML, "w") as f:
-            f.write(lines)
+    with open(dest / TS_PRE_COMMIT_CONFIG_YAML, "w") as f:
+        f.write(lines)
 
 
 def _print_instructions_and_exit(args: types.SimpleNamespace) -> None:
@@ -231,14 +240,14 @@ def _print_instructions_and_exit(args: types.SimpleNamespace) -> None:
         missing config file.
     """
     message = "Create one by copying and pasting the following lines:\n"
-    message = message + "\n"
-    message = message + "check-yaml: true\n"
-    message = message + "check-xml: true\n"
-    message = message + "black: true\n"
-    message = message + "flake8: true\n"
-    message = message + "isort: true\n"
-    message = message + f"mypy: {'true' if args.no_mypy is False else 'false'}"
-    message = message + "\n"
+    message += "\n"
+    message += "check-yaml: true\n"
+    message += "check-xml: true\n"
+    message += "clang-format: true\n"
+    message += "black: true\n"
+    message += "flake8: true\n"
+    message += "isort: true\n"
+    message += f"mypy: {'true' if args.no_mypy is False else 'false'}\n"
     raise FileNotFoundError(message)
 
 
@@ -248,6 +257,7 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
 
         check-yaml
         check-xml
+        clang-format
         black
         flake8
         isort
@@ -347,7 +357,7 @@ def update_args_from_config_file(args: types.SimpleNamespace) -> None:
 
 
 def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
-    """Generate the '.pre-commit-conif.yaml' file. Both the contents and the
+    """Generate the '.pre-commit-conf.yaml' file. Both the contents and the
     destination path are determined from the provided args.
 
     Parameters
@@ -360,7 +370,7 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
         pre_commit_config = f.read()
     if args.no_mypy is False:
         with open(MYPY_PRE_COMMIT_HOOK_TEMPLATE) as f:
-            pre_commit_config = pre_commit_config + f.read()
+            pre_commit_config += f.read()
     with open(pathlib.Path(dest) / PRE_COMMIT_CONFIG_FILE_NAME, "w") as f:
         f.write(pre_commit_config)
 
@@ -376,6 +386,7 @@ def copy_config_files(args: types.SimpleNamespace) -> None:
         path to copy them to.
     """
     dest = _get_dest(args=args)
+    shutil.copy(CLANG_FORMAT_CONFIG_FILE, dest)
     shutil.copy(FLAKE8_CONFIG_FILE, dest)
     shutil.copy(ISORT_CONFIG_FILE, dest)
     if "no_mypy" not in vars(args) or args.no_mypy is False:
@@ -404,6 +415,8 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
     with open(dot_gitignore, "a") as f:
         if PRE_COMMIT_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
+        if CLANG_FORMAT_CONFIG_FILE_NAME not in dot_gitignore_contents:
+            f.write(f"{CLANG_FORMAT_CONFIG_FILE_NAME}\n")
         if FLAKE8_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{FLAKE8_CONFIG_FILE_NAME}\n")
         if ISORT_CONFIG_FILE_NAME not in dot_gitignore_contents:
