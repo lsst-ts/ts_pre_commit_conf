@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.5.0
+======
+
+* clang-format pre-commit check.
+
 v0.4.4
 ======
 

@@ -357,7 +357,7 @@ def update_args_from_config_file(args: types.SimpleNamespace) -> None:
 
 
 def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
-    """Generate the '.pre-commit-conf.yaml' file. Both the contents and the
+    """Generate the '.pre-commit-config.yaml' file. Both the contents and the
     destination path are determined from the provided args.
 
     Parameters
