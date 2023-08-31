@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.5.1
+======
+
+* Ignore missing clang-format line in config file.
+
 v0.5.0
 ======
 

@@ -82,11 +82,12 @@ DOT_GITIGNORE = ".gitignore"
 
 # Mandatory pre-commit hooks for TSSW.
 MANDATORY_PRE_COMMIT_HOOKS = frozenset(
-    ("check-yaml", "check-xml", "black", "flake8", "isort", "clang-format")
+    ("check-yaml", "check-xml", "black", "flake8", "isort")
 )
 
-# Optional pre-commit hooks for TSSW and the arg used for them.
-OPTIONAL_PRE_COMMIT_HOOKS = {"mypy": "no_mypy"}
+# Optional pre-commit hooks for TSSW and the arg used for them. If arg is None,
+# there isn't argument to turn those off.
+OPTIONAL_PRE_COMMIT_HOOKS = {"mypy": "no_mypy", "clang-format": None}
 
 # All pre-commit hooks for TSSW.
 ALL_PRE_COMMIT_HOOKS = MANDATORY_PRE_COMMIT_HOOKS.union(OPTIONAL_PRE_COMMIT_HOOKS)
@@ -298,6 +299,12 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
             if option == hook:
                 missing = False
                 break
+        if (
+            hook in OPTIONAL_PRE_COMMIT_HOOKS.keys()
+            and OPTIONAL_PRE_COMMIT_HOOKS[hook] is None
+        ):
+            missing = False
+            break
         if missing:
             missing_hooks.append(hook)
     for hook in MANDATORY_PRE_COMMIT_HOOKS:
@@ -351,9 +358,10 @@ def update_args_from_config_file(args: types.SimpleNamespace) -> None:
         config = yaml.safe_load(f)
 
     for hook in OPTIONAL_PRE_COMMIT_HOOKS:
-        option = config[hook]
         arg = OPTIONAL_PRE_COMMIT_HOOKS[hook]
-        setattr(args, arg, not option)
+        if arg is not None:
+            option = config[hook]
+            setattr(args, arg, not option)
 
 
 def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
