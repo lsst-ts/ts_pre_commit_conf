@@ -35,6 +35,7 @@ from lsst.ts.pre_commit_conf.pre_commit_conf_generator import (
     ISORT_CONFIG_FILE,
     MYPY_CONFIG_FILE,
     PRE_COMMIT_CONFIG_FILE_NAME,
+    RUFF_CONFIG_FILE,
     TS_PRE_COMMIT_CONFIG_YAML,
     copy_config_files,
     create_or_report_missing_config_file,
@@ -271,6 +272,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                 FLAKE8_CONFIG_FILE,
                 ISORT_CONFIG_FILE,
                 MYPY_CONFIG_FILE,
+                RUFF_CONFIG_FILE,
             ]
             self.validate_config_files(
                 expected_conf_files=expected_conf_files, **kwargs  # type: ignore
@@ -281,6 +283,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             CLANG_FORMAT_CONFIG_FILE,
             FLAKE8_CONFIG_FILE,
             ISORT_CONFIG_FILE,
+            RUFF_CONFIG_FILE,
         ]
         self.validate_config_files(
             expected_conf_files=expected_conf_files,

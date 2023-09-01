@@ -5,3 +5,4 @@ black: true
 flake8: true
 isort: true
 mypy: true
+ruff: true

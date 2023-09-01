@@ -9,14 +9,17 @@ version.py
 tests/.tests
 pytest_session.txt
 .cache/
+.mypy_cache
+.ruff_cache
 .pytest_cache
 .coverage
 
 # Python cache
 __pycache__/
 
+.pre-commit-config.yaml
+.clang-format
 .flake8
 .isort.cfg
 .mypy.ini
-.pre-commit-config.yaml
-.clang-format
+.ruff.toml

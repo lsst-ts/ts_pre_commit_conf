@@ -38,6 +38,8 @@ __all__ = [
     "MYPY_CONFIG_FILE",
     "MYPY_CONFIG_FILE_NAME",
     "PRE_COMMIT_CONFIG_FILE_NAME",
+    "RUFF_CONFIG_FILE",
+    "RUFF_CONFIG_FILE_NAME",
     "TS_PRE_COMMIT_CONFIG_YAML",
     "copy_config_files",
     "create_or_report_missing_config_file",
@@ -66,6 +68,7 @@ FLAKE8_CONFIG_FILE_NAME = ".flake8"
 ISORT_CONFIG_FILE_NAME = ".isort.cfg"
 MYPY_CONFIG_FILE_NAME = ".mypy.ini"
 PRE_COMMIT_CONFIG_FILE_NAME = ".pre-commit-config.yaml"
+RUFF_CONFIG_FILE_NAME = ".ruff.toml"
 
 # Config file paths for the pre-commit hooks.
 CLANG_FORMAT_CONFIG_FILE = CONFIG_FILES_DIR / CLANG_FORMAT_CONFIG_FILE_NAME
@@ -73,6 +76,7 @@ TS_PRE_COMMIT_CONFIG_YAML_FILE = CONFIG_FILES_DIR / TS_PRE_COMMIT_CONFIG_YAML
 FLAKE8_CONFIG_FILE = CONFIG_FILES_DIR / FLAKE8_CONFIG_FILE_NAME
 ISORT_CONFIG_FILE = CONFIG_FILES_DIR / ISORT_CONFIG_FILE_NAME
 MYPY_CONFIG_FILE = CONFIG_FILES_DIR / MYPY_CONFIG_FILE_NAME
+RUFF_CONFIG_FILE = CONFIG_FILES_DIR / RUFF_CONFIG_FILE_NAME
 
 # Template files.
 MYPY_PRE_COMMIT_HOOK_TEMPLATE = TEMPLATES_DIR / "mypy-pre-commit-hook-template.yaml"
@@ -87,7 +91,7 @@ MANDATORY_PRE_COMMIT_HOOKS = frozenset(
 
 # Optional pre-commit hooks for TSSW and the arg used for them. If arg is None,
 # there isn't argument to turn those off.
-OPTIONAL_PRE_COMMIT_HOOKS = {"mypy": "no_mypy", "clang-format": None}
+OPTIONAL_PRE_COMMIT_HOOKS = {"mypy": "no_mypy", "clang-format": None, "ruff": None}
 
 # All pre-commit hooks for TSSW.
 ALL_PRE_COMMIT_HOOKS = MANDATORY_PRE_COMMIT_HOOKS.union(OPTIONAL_PRE_COMMIT_HOOKS)
@@ -397,6 +401,7 @@ def copy_config_files(args: types.SimpleNamespace) -> None:
     shutil.copy(CLANG_FORMAT_CONFIG_FILE, dest)
     shutil.copy(FLAKE8_CONFIG_FILE, dest)
     shutil.copy(ISORT_CONFIG_FILE, dest)
+    shutil.copy(RUFF_CONFIG_FILE, dest)
     if "no_mypy" not in vars(args) or args.no_mypy is False:
         shutil.copy(MYPY_CONFIG_FILE, dest)
 
@@ -421,7 +426,7 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
     with open(dot_gitignore) as f:
         dot_gitignore_contents = f.read()
     with open(dot_gitignore, "a") as f:
-        if not dot_gitignore_contents[-1] == "\n":
+        if len(dot_gitignore_contents) > 0 and not dot_gitignore_contents[-1] == "\n":
             f.write("\n")
         if PRE_COMMIT_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
@@ -433,6 +438,8 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
             f.write(f"{ISORT_CONFIG_FILE_NAME}\n")
         if MYPY_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{MYPY_CONFIG_FILE_NAME}\n")
+        if RUFF_CONFIG_FILE_NAME not in dot_gitignore_contents:
+            f.write(f"{RUFF_CONFIG_FILE_NAME}\n")
 
 
 def generate_pre_commit_conf() -> None:
