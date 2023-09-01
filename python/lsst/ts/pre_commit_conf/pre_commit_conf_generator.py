@@ -421,6 +421,8 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
     with open(dot_gitignore) as f:
         dot_gitignore_contents = f.read()
     with open(dot_gitignore, "a") as f:
+        if not dot_gitignore_contents[-1] == "\n":
+            f.write("\n")
         if PRE_COMMIT_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
         if CLANG_FORMAT_CONFIG_FILE_NAME not in dot_gitignore_contents:
