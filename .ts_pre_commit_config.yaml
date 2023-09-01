@@ -1,7 +1,6 @@
 check-yaml: true
 check-xml: true
 clang-format: true
-aa: false
 black: true
 flake8: true
 isort: true
