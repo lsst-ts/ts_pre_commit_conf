@@ -3,6 +3,7 @@ check-xml: true
 check-yaml: true
 clang-format: true
 flake8: true
+format-xmllint: true
 isort: true
 mypy: true
 ruff: true

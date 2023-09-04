@@ -111,6 +111,14 @@ exclude = __init__.py
       - id: flake8
 """,
     ),
+    "format-xmllint": PreCommitHookMetadata(
+        pre_commit_config="""
+  - repo: https://github.com/lsst-ts/pre-commit-xmllint
+    rev: v1.0.0
+    hooks:
+      - id: format-xmllint
+""",
+    ),
     "isort": PreCommitHookMetadata(
         config_file_name=".isort.cfg",
         config="""[settings]
