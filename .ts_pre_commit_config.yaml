@@ -1,7 +1,7 @@
-check-yaml: true
-check-xml: true
-clang-format: true
 black: true
+check-xml: true
+check-yaml: true
+clang-format: true
 flake8: true
 isort: true
 mypy: true
