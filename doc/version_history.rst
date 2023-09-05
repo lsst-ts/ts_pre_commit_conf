@@ -6,6 +6,16 @@
 Version History
 ###############
 
+v0.6.0
+======
+
+* Update versions of pre-commit hooks.
+* Simplify adding new hooks.
+* Add new hooks:
+
+  * format-xmllint
+  * ruff
+
 v0.5.1
 ======
 
