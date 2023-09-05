@@ -303,7 +303,7 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
 
         # Skip optional hooks.
         hook = registry[hook_name]
-        if hook.excludable:
+        if hook.optional:
             continue
 
         incorrect_config_option = True

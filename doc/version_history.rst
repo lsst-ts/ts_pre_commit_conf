@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.6.1
+======
+
+* Make sure that optional hooks really are optional.
+
 v0.6.0
 ======
 
