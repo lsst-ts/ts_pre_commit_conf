@@ -118,6 +118,7 @@ exclude = __init__.py
     hooks:
       - id: format-xmllint
 """,
+        optional=True,
     ),
     "isort": PreCommitHookMetadata(
         config_file_name=".isort.cfg",
