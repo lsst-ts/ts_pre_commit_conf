@@ -20,3 +20,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from .pre_commit_conf_generator import *
+from .pre_commit_hooks import *
