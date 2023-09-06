@@ -19,6 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import asyncio
 import logging
 import pathlib
 import tempfile
@@ -303,3 +304,17 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
         # MyPy config file name always gets added.
         for kwargs in (dict(), dict(no_mypy=False), dict(no_mypy=True)):
             self.validate_dot_gitignore(**kwargs)  # type: ignore
+
+    async def test_run_pre_commit_install(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            args = self.create_args(dest=tmpdirname)
+
+            # First try in an empty directory. This should fail.
+            with pytest.raises(RuntimeError):
+                await pre_commit_conf.run_pre_commit_install(args=args)
+
+            # Initialize a git repo and try again. Now it should work.
+            git_args = ["git", "init", tmpdirname]
+            process = await asyncio.create_subprocess_exec(*git_args)
+            await process.wait()
+            await pre_commit_conf.run_pre_commit_install(args=args)
