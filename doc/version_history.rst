@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.7.0
+======
+
+* Make sure that ``pre-commit install`` is executed when ``generate_pre_commit_conf`` is.
+
 v0.6.1
 ======
 

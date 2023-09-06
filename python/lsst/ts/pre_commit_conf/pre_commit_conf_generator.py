@@ -28,13 +28,17 @@ __all__ = [
     "generate_pre_commit_conf",
     "generate_pre_commit_conf_file",
     "parse_args",
+    "run_pre_commit_install",
     "update_args_from_config_file",
     "update_dot_gitignore",
     "validate_config_file_contents",
 ]
 
 import argparse
+import asyncio
+import os
 import pathlib
+import shutil
 import sys
 import types
 
@@ -51,6 +55,9 @@ PRE_COMMIT_CONFIG_FILE_NAME = ".pre-commit-config.yaml"
 
 # The Git ignore file.
 DOT_GITIGNORE = ".gitignore"
+
+# Process timeout (sec)
+PROCESS_TIMEOUT = 5
 
 
 def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
@@ -414,6 +421,8 @@ def create_config_files(args: types.SimpleNamespace) -> None:
                 arg = getattr(args, f"no_{hook_name}", None)
                 if not arg:
                     assert hook.config is not None
+                    hook_config_file_name = dest / hook.config_file_name
+                    print(f"Creating {hook_config_file_name}.")
                     with open(dest / hook.config_file_name, "w") as f:
                         f.write(hook.config)
 
@@ -451,6 +460,53 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
                 f.write(f"{hook.config_file_name}\n")
 
 
+async def run_pre_commit_install(args: types.SimpleNamespace) -> None:
+    """Run the ``pre-commit install`` command.
+
+    Parameters
+    ----------
+    args : `types.SimpleNamespace`
+        The args that determine which destination path pre-commit is to be
+        executed in.
+
+    Raises
+    ------
+    `RuntimeError`
+        In case the execution of pre-commit terminated unsuccessfully.
+    """
+    exe_path = shutil.which("pre-commit")
+    if exe_path is None:
+        raise AssertionError("Could not find pre-commit executable.")
+    dest = _get_dest(args=args)
+
+    # Get the current working directory for later reference.
+    cwd = os.getcwd()
+
+    # Change to the destination directory.
+    os.chdir(dest)
+
+    # Execute ``pre-commit install``
+    process_args = ["pre-commit", "install"]
+    process = await asyncio.create_subprocess_exec(
+        *process_args,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    message = stdout.decode().strip()
+
+    # Return to the original working directory.
+    os.chdir(cwd)
+
+    # Handle the return code of the process.
+    if process.returncode == 0:
+        # Execution terminated successfully.
+        print(message)
+    else:
+        # Execution terminated unsuccessfully.
+        raise RuntimeError(message)
+
+
 def generate_pre_commit_conf() -> None:
     """Main function that generates the .prec-ommit-config.yaml file. It also
     copies the required pre-commit hook config files and updates/creates the
@@ -459,11 +515,12 @@ def generate_pre_commit_conf() -> None:
     command_line_args = sys.argv[1:]
     try:
         args = parse_args(command_line_args=command_line_args)
-        create_or_report_missing_config_file(args)
-        validate_config_file_contents(args)
+        create_or_report_missing_config_file(args=args)
+        validate_config_file_contents(args=args)
     except (ValueError, FileNotFoundError) as e:
         sys.exit(str(e))
-    update_args_from_config_file(args)
-    generate_pre_commit_conf_file(args)
-    create_config_files(args)
-    update_dot_gitignore(args)
+    update_args_from_config_file(args=args)
+    generate_pre_commit_conf_file(args=args)
+    create_config_files(args=args)
+    update_dot_gitignore(args=args)
+    asyncio.run(run_pre_commit_install(args=args))
