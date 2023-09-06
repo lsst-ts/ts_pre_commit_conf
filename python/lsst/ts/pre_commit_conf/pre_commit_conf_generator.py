@@ -421,6 +421,8 @@ def create_config_files(args: types.SimpleNamespace) -> None:
                 arg = getattr(args, f"no_{hook_name}", None)
                 if not arg:
                     assert hook.config is not None
+                    hook_config_file_name = dest / hook.config_file_name
+                    print(f"Creating {hook_config_file_name}.")
                     with open(dest / hook.config_file_name, "w") as f:
                         f.write(hook.config)
 
