@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.7.1
+======
+
+* Add ``pre-commit`` as test and runtime dependency.
+
 v0.7.0
 ======
 
