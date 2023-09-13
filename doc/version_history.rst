@@ -6,6 +6,14 @@
 Version History
 ###############
 
+v0.7.2
+======
+
+* Update ruff configuration and the black and ruff pre-commit hook versions.
+* Allow for disabling running "pre-commit install".
+  This is necessary for the CI jobs in Jenkins.
+  Developers should not use this option, which is why the option has a long name.
+
 v0.7.1
 ======
 

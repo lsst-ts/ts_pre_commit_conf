@@ -96,6 +96,12 @@ def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
         "scripts that update more than one project at a time.",
     )
 
+    parser.add_argument(
+        "--skip-pre-commit-install",
+        default=False,
+        help="Skip running 'pre-commit install'. This should only be done on Jenkins.",
+    )
+
     for hook_name in registry:
         hook = registry[hook_name]
         if hook.excludable:
@@ -474,6 +480,10 @@ async def run_pre_commit_install(args: types.SimpleNamespace) -> None:
     `RuntimeError`
         In case the execution of pre-commit terminated unsuccessfully.
     """
+    if "skip_pre_commit_install" in vars(args) and args.skip_pre_commit_install:
+        print("Not running 'pre-commit install'.")
+        return
+
     exe_path = shutil.which("pre-commit")
     if exe_path is None:
         raise AssertionError("Could not find pre-commit executable.")

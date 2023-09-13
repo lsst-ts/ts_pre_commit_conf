@@ -72,7 +72,7 @@ registry = {
     "black": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 23.9.1
     hooks:
       - id: black
 """,
@@ -162,7 +162,9 @@ exclude = version.py
     ),
     "ruff": PreCommitHookMetadata(
         config_file_name=".ruff.toml",
-        config="""ignore = ["E203", "E226", "E228", "N802", "N803", "N806", "N812", "N813", "N815", "N816"]
+        config="""ignore = [
+  "E203", "E226", "E228", "E999", "N802", "N803", "N806", "N812", "N813", "N815", "N816"
+]
 line-length = 110
 exclude = ["__init__.py"]
 select = ["E", "F", "N", "W"]
@@ -173,7 +175,7 @@ convention = "numpy"
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.287
+    rev: v0.0.289
     hooks:
       - id: ruff
 """,
