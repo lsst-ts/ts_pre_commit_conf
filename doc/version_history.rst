@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.7.4
+======
+
+* Make the clang format pre-commit hook excludable.
+
 v0.7.3
 ======
 

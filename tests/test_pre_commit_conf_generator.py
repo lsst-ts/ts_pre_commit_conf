@@ -138,7 +138,9 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
 
     async def test_update_args_from_config_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdirname:
-            args = self.create_args(dest=tmpdirname, create=True, no_mypy=False)
+            args = self.create_args(
+                dest=tmpdirname, create=True, no_mypy=False, no_clang_format=False
+            )
             orig_args = copy(args)
             config_path = (
                 pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML

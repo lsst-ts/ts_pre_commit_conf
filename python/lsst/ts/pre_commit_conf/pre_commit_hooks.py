@@ -95,6 +95,7 @@ ContinuationIndentWidth: 8
       - id: clang-format
 """,
         optional=True,
+        excludable=True,
     ),
     "flake8": PreCommitHookMetadata(
         config_file_name=".flake8",
