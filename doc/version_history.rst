@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.7.3
+======
+
+* Disabling running "pre-commit install" no longer requires an explicit "true".
+
 v0.7.2
 ======
 
