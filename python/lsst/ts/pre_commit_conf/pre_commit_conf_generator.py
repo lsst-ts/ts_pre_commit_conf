@@ -99,6 +99,7 @@ def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
     parser.add_argument(
         "--skip-pre-commit-install",
         default=False,
+        action="store_true",
         help="Skip running 'pre-commit install'. This should only be done on Jenkins.",
     )
 
