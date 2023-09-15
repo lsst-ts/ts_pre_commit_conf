@@ -200,7 +200,7 @@ def _create_config_file(args: types.SimpleNamespace) -> None:
         if not hook.excludable:
             lines.append(f"{hook_name}: true")
         else:
-            arg = getattr(args, f"no_{hook_name}")
+            arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
             lines.append(f"{hook_name}: {'true' if arg is False else 'false'}")
     lines = sorted(lines)
     with open(dest / TS_PRE_COMMIT_CONFIG_YAML, "w") as f:
@@ -235,7 +235,7 @@ def _print_instructions_and_exit(args: types.SimpleNamespace) -> None:
         if not hook.excludable:
             message += f"{hook_name}: true\n"
         else:
-            arg = getattr(args, f"no_{hook_name}")
+            arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
             message += f"{hook_name}: {'true' if arg is False else 'false'}\n"
     raise FileNotFoundError(message)
 
@@ -376,7 +376,7 @@ def update_args_from_config_file(args: types.SimpleNamespace) -> None:
         hook = registry[hook_name]
         if hook.excludable:
             option = config[hook_name]
-            setattr(args, f"no_{hook_name}", not option)
+            setattr(args, f"no_{hook_name.replace('-', '_')}", not option)
 
 
 def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
@@ -395,7 +395,7 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
         if not hook.excludable:
             pre_commit_config += hook.pre_commit_config
         else:
-            arg = getattr(args, f"no_{hook_name}")
+            arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
             pre_commit_config += "" if arg else hook.pre_commit_config
     pre_commit_config_filename = pathlib.Path(dest) / PRE_COMMIT_CONFIG_FILE_NAME
     print(f"Creating {pre_commit_config_filename}.")
