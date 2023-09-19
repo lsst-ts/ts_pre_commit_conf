@@ -139,7 +139,14 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_update_args_from_config_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdirname:
             args = self.create_args(
-                dest=tmpdirname, create=True, no_mypy=False, no_clang_format=False
+                dest=tmpdirname,
+                create=True,
+                no_mypy=False,
+                with_clang_format=True,
+                with_format_xmlint=True,
+                with_ruff=True,
+                with_towncrier=True,
+                with_format_xmllint=True,
             )
             orig_args = copy(args)
             config_path = (
@@ -176,6 +183,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
 
                 * no_mypy
         """
+        print(kwargs)
         args = self.create_args(**kwargs)
         with tempfile.TemporaryDirectory() as tmpdirname:
             # Set destination path to avoid left over files from running the
@@ -191,26 +199,50 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             for expected_hook_name in expected_hook_names:
                 expected_hook = pre_commit_conf.registry[expected_hook_name]
                 expected_pre_commit_config = expected_hook.pre_commit_config
-                assert expected_pre_commit_config in generated_conf
+                assert (
+                    expected_pre_commit_config in generated_conf
+                ), f"Expected: {expected_pre_commit_config}\n Got: {generated_conf}"
             for expected_hook_name in pre_commit_conf.registry:
                 if expected_hook_name not in expected_hook_names:
                     expected_hook = pre_commit_conf.registry[expected_hook_name]
                     expected_pre_commit_config = expected_hook.pre_commit_config
-                    if expected_hook.excludable:
+                    arg_prefix = (
+                        "no"
+                        if expected_hook.rule_type
+                        == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT
+                        else "with"
+                    )
+                    modifier_flag = kwargs.get(
+                        f"{arg_prefix}_{expected_hook_name}",
+                        expected_hook.rule_type
+                        == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT,
+                    )
+                    if (
+                        expected_hook.rule_type
+                        == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT
+                    ):
+                        modifier_flag = not modifier_flag
+                    if (
+                        expected_hook.rule_type
+                        != pre_commit_conf.pre_commit_hooks.RuleType.MANDATORY
+                        and not modifier_flag
+                    ):
                         assert expected_pre_commit_config not in generated_conf
                     else:
-                        assert expected_pre_commit_config in generated_conf
+                        assert (
+                            expected_pre_commit_config in generated_conf
+                        ), f"Expected: {expected_pre_commit_config}\n to be in \n {generated_conf}."
 
     async def test_generate_pre_commit_conf(self) -> None:
         # Nominal case where all pre-commit hooks are included.
         self.validate_pre_commit_conf(
-            expected_hook_names=["clang-format", "flake8", "isort", "mypy", "ruff"],
+            expected_hook_names=["flake8", "isort", "mypy"],
             no_mypy=False,
         )
 
         # Exclude mypy.
         self.validate_pre_commit_conf(
-            expected_hook_names=["clang-format", "flake8", "isort", "ruff"],
+            expected_hook_names=["flake8", "isort"],
             no_mypy=True,
         )
 
@@ -260,13 +292,14 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_create_config_files(self) -> None:
         # Nominal cases where all pre-commit hooks are included.
         for kwargs in (dict(), dict(no_mypy=False)):
-            expected_hook_names = ["clang-format", "flake8", "isort", "mypy", "ruff"]
+            print(kwargs)
+            expected_hook_names = ["flake8", "isort", "mypy"]
             self.validate_config_files(
                 expected_hook_names=expected_hook_names, **kwargs  # type: ignore
             )
 
         # Exclude mypy.
-        expected_hook_names = ["clang-format", "flake8", "isort", "ruff"]
+        expected_hook_names = ["flake8", "isort"]
         self.validate_config_files(
             expected_hook_names=expected_hook_names, no_mypy=True
         )
