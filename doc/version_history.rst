@@ -6,6 +6,20 @@
 Version History
 ###############
 
+v0.8.0
+======
+
+* Refactor how exclusion/inclusion of pre-commit hooks is managed.
+
+  Instead of having 2 flags (optional and excludable) to control how a rule is managed, use an enumeration.
+  For now, the enumeration specify 3 types of rules; mandatory, opt-out, opt-in.
+
+  Mandatory rules, as the name say, cannot be switched off.
+  opt-out rules are included by default but can be switched off.
+  opt-in rules as excluded by default and can be included.
+
+* Add new pre-commit hook for towncrier.
+
 v0.7.4
 ======
 
