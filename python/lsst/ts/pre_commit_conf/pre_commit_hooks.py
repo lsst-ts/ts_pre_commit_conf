@@ -19,9 +19,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["registry"]
+__all__ = ["registry", "RuleType"]
 
+import enum
 from dataclasses import dataclass
+
+
+class RuleType(enum.Enum):
+    MANDATORY = enum.auto()
+    OPT_IN = enum.auto()
+    OPT_OUT = enum.auto()
 
 
 @dataclass(eq=True, frozen=True)
@@ -39,12 +46,9 @@ class PreCommitHookMetadata:
         The configuration of the pre-commit hook as contained by the
         configuration file. Set to None if no configuration file exists for
         this hook. The default is None.
-    optional : `bool`
-        Whether (True) or not (False) this hook is optional. The default is
-        False.
-    excludable : `bool`
-        Whether (True) or not (False) it can be excluded via a command line
-        option. The default is False.
+    rule_type : `RuleType`
+        Enumeration specifying what type of rule this is. This determines if
+        a rule is mandatory, opt-in or opt-out.
 
     Notes
     -----
@@ -55,8 +59,7 @@ class PreCommitHookMetadata:
     pre_commit_config: str
     config_file_name: str | None = None
     config: str | None = None
-    optional: bool = False
-    excludable: bool = False
+    rule_type: RuleType = RuleType.MANDATORY
 
     def __post_init__(self) -> None:
         if (self.config_file_name is None and self.config is not None) or (
@@ -94,8 +97,7 @@ ContinuationIndentWidth: 8
     hooks:
       - id: clang-format
 """,
-        optional=True,
-        excludable=True,
+        rule_type=RuleType.OPT_IN,
     ),
     "flake8": PreCommitHookMetadata(
         config_file_name=".flake8",
@@ -119,7 +121,7 @@ exclude = __init__.py
     hooks:
       - id: format-xmllint
 """,
-        optional=True,
+        rule_type=RuleType.OPT_IN,
     ),
     "isort": PreCommitHookMetadata(
         config_file_name=".isort.cfg",
@@ -148,8 +150,7 @@ exclude = version.py
       - id: mypy
         additional_dependencies: [types-PyYAML==6]
 """,
-        optional=True,
-        excludable=True,
+        rule_type=RuleType.OPT_OUT,
     ),
     "pre-commit-hooks": PreCommitHookMetadata(
         pre_commit_config="""
@@ -180,6 +181,6 @@ convention = "numpy"
     hooks:
       - id: ruff
 """,
-        optional=True,
+        rule_type=RuleType.OPT_IN,
     ),
 }

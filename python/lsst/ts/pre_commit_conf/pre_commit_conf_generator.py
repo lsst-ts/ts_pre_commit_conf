@@ -44,7 +44,7 @@ import types
 
 import yaml
 
-from .pre_commit_hooks import registry
+from .pre_commit_hooks import RuleType, registry
 
 # The YAML file holding the configuration for the "generate_pre_commit_conf"
 # command.
@@ -105,13 +105,22 @@ def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
 
     for hook_name in registry:
         hook = registry[hook_name]
-        if hook.excludable:
+        if hook.rule_type == RuleType.OPT_OUT:
             parser.add_argument(
                 f"--no-{hook_name}",
                 action="store_true",
                 default=False,
-                help=f"Generate a pre-commit configuration file without {hook_name} "
+                help=f"Exclude {hook_name} from the pre-commit configuration. "
                 f"(default: False, meaning {hook_name} gets included). This options requires "
+                "--create to be specified as well.",
+            )
+        elif hook.rule_type == RuleType.OPT_IN:
+            parser.add_argument(
+                f"--with-{hook_name}",
+                action="store_true",
+                default=False,
+                help=f"Include {hook_name} in the pre-commit configuration. "
+                f"(default: False, meaning {hook_name} is not included). This options requires "
                 "--create to be specified as well.",
             )
 
@@ -162,6 +171,7 @@ def create_or_report_missing_config_file(args: types.SimpleNamespace) -> None:
         error message contains the instructions for how to create the missing
         config file.
     """
+    print("Creating config file.")
     dest = _get_dest(args=args)
     config_path = dest / TS_PRE_COMMIT_CONFIG_YAML
     if not config_path.exists():
@@ -197,10 +207,22 @@ def _create_config_file(args: types.SimpleNamespace) -> None:
             lines.append("check-xml: true")
             continue
         hook = registry[hook_name]
-        if not hook.excludable:
+        if hook.rule_type == RuleType.MANDATORY:
             lines.append(f"{hook_name}: true")
         else:
-            arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
+            # If the rule is opt-out, the arg name prefix is "no", of the rule
+            # is opt-in it is "with".
+            hook_arg_name_prefix = (
+                "no" if hook.rule_type == RuleType.OPT_OUT else "with"
+            )
+            arg = getattr(
+                args,
+                f"{hook_arg_name_prefix}_{hook_name.replace('-', '_')}",
+                hook.rule_type == RuleType.OPT_IN,
+            )
+            # need to flip the boolean if this rule is opt_in.
+            if hook.rule_type == RuleType.OPT_IN:
+                arg = not arg
             lines.append(f"{hook_name}: {'true' if arg is False else 'false'}")
     lines = sorted(lines)
     with open(dest / TS_PRE_COMMIT_CONFIG_YAML, "w") as f:
@@ -232,11 +254,18 @@ def _print_instructions_and_exit(args: types.SimpleNamespace) -> None:
             message += "check-xml: true\n"
             continue
         hook = registry[hook_name]
-        if not hook.excludable:
+        if hook.rule_type == RuleType.MANDATORY:
             message += f"{hook_name}: true\n"
-        else:
+        elif hook.rule_type == RuleType.OPT_OUT:
             arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
-            message += f"{hook_name}: {'true' if arg is False else 'false'}\n"
+            message += f"{hook_name}: {'false' if arg else 'true'}\n"
+        elif hook.rule_type == RuleType.OPT_IN:
+            arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
+            message += f"{hook_name}: {'true' if arg else 'false'}\n"
+        else:
+            raise RuntimeError(
+                f"Unrecognized hook type: {hook.rule_type!r} for {hook_name}."
+            )
     raise FileNotFoundError(message)
 
 
@@ -303,7 +332,7 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
             continue
 
         hook = registry[hook_name]
-        if hook.optional:
+        if hook.rule_type != RuleType.MANDATORY:
             missing = False
         if missing:
             missing_hooks.append(hook_name)
@@ -317,7 +346,7 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
 
         # Skip optional hooks.
         hook = registry[hook_name]
-        if hook.optional:
+        if hook.rule_type != RuleType.MANDATORY:
             continue
 
         incorrect_config_option = True
@@ -374,9 +403,12 @@ def update_args_from_config_file(args: types.SimpleNamespace) -> None:
 
     for hook_name in registry:
         hook = registry[hook_name]
-        if hook.excludable:
-            option = config[hook_name]
+        if hook.rule_type == RuleType.OPT_OUT:
+            option = config.get(hook_name, True)
             setattr(args, f"no_{hook_name.replace('-', '_')}", not option)
+        elif hook.rule_type == RuleType.OPT_IN:
+            option = config.get(hook_name, False)
+            setattr(args, f"with_{hook_name.replace('-', '_')}", option)
 
 
 def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
@@ -392,11 +424,14 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
     pre_commit_config = "repos:"
     for hook_name in registry:
         hook = registry[hook_name]
-        if not hook.excludable:
+        if hook.rule_type == RuleType.MANDATORY:
             pre_commit_config += hook.pre_commit_config
-        else:
+        elif hook.rule_type == RuleType.OPT_OUT:
             arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
-            pre_commit_config += "" if arg else hook.pre_commit_config
+            pre_commit_config += hook.pre_commit_config if not arg else ""
+        elif hook.rule_type == RuleType.OPT_IN:
+            arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
+            pre_commit_config += hook.pre_commit_config if arg else ""
     pre_commit_config_filename = pathlib.Path(dest) / PRE_COMMIT_CONFIG_FILE_NAME
     print(f"Creating {pre_commit_config_filename}.")
     with open(pre_commit_config_filename, "w") as f:
@@ -418,15 +453,23 @@ def create_config_files(args: types.SimpleNamespace) -> None:
     for hook_name in registry:
         hook = registry[hook_name]
         if hook.config_file_name:
-            if not hook.excludable:
+            if hook.rule_type == RuleType.MANDATORY:
                 assert hook.config is not None
                 hook_config_file_name = dest / hook.config_file_name
                 print(f"Creating {hook_config_file_name}.")
                 with open(hook_config_file_name, "w") as f:
                     f.write(hook.config)
-            else:
-                arg = getattr(args, f"no_{hook_name}", None)
+            elif hook.rule_type == RuleType.OPT_OUT:
+                arg = getattr(args, f"no_{hook_name}", False)
                 if not arg:
+                    assert hook.config is not None
+                    hook_config_file_name = dest / hook.config_file_name
+                    print(f"Creating {hook_config_file_name}.")
+                    with open(dest / hook.config_file_name, "w") as f:
+                        f.write(hook.config)
+            elif hook.rule_type == RuleType.OPT_IN:
+                arg = getattr(args, f"with_{hook_name}", False)
+                if arg:
                     assert hook.config is not None
                     hook_config_file_name = dest / hook.config_file_name
                     print(f"Creating {hook_config_file_name}.")
