@@ -23,3 +23,7 @@ __pycache__/
 .isort.cfg
 .mypy.ini
 .ruff.toml
+
+# pypi files
+
+*.egg-info/
