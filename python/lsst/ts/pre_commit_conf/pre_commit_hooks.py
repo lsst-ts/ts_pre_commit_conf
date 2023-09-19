@@ -183,4 +183,52 @@ convention = "numpy"
 """,
         rule_type=RuleType.OPT_IN,
     ),
+    "towncrier": PreCommitHookMetadata(
+        pre_commit_config="""
+  - repo: https://github.com/twisted/towncrier
+    rev: 23.6.0
+    hooks:
+      - id: towncrier-check
+      """,
+        config_file_name="towncrier.toml",
+        config="""[tool.towncrier]
+package_dir = "python"
+filename = "doc/version_history.rst"
+directory = "doc/news"
+filename_format = "{name}.{type}.rst|{name}.{type}.md"
+title_format = "{version} ({project_date})"
+issue_format = "`{issue} <https://jira.lsstcorp.org/browse/{issue}>`_"
+
+[[tool.towncrier.type]]
+    directory = "feature"
+    name = "New Features"
+    showcontent = true
+
+[[tool.towncrier.type]]
+    directory = "bugfix"
+    name = "Bug Fixes"
+    showcontent = true
+
+[[tool.towncrier.type]]
+    directory = "perf"
+    name = "Performance Enhancement"
+    showcontent = true
+
+[[tool.towncrier.type]]
+    directory = "doc"
+    name = "Documentation"
+    showcontent = true
+
+[[tool.towncrier.type]]
+    directory = "removal"
+    name = "API Removal or Deprecation"
+    showcontent = true
+
+[[tool.towncrier.type]]
+    directory = "misc"
+    name = "Other Changes and Additions"
+    showcontent = true
+""",
+        rule_type=RuleType.OPT_IN,
+    ),
 }
