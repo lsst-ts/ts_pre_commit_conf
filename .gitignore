@@ -27,3 +27,4 @@ __pycache__/
 # pypi files
 
 *.egg-info/
+towncrier.toml
