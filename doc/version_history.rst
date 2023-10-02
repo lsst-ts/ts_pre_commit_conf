@@ -6,16 +6,23 @@
 Version History
 ###############
 
+v0.9.0
+======
+
+* Mark all mandatory hooks as such.
+* Change default behavior to not overwrite existing hook config files.
+  Also add a command line option to force overwriting existing hook config files.
+
 v0.8.0
 ======
 
 * Refactor how exclusion/inclusion of pre-commit hooks is managed.
 
   Instead of having 2 flags (optional and excludable) to control how a rule is managed, use an enumeration.
-  For now, the enumeration specify 3 types of rules; mandatory, opt-out, opt-in.
+  For now, the enumeration specifies 3 types of rules; mandatory, opt-out, opt-in.
 
-  Mandatory rules, as the name say, cannot be switched off.
-  opt-out rules are included by default but can be switched off.
+  Mandatory rules, as the name say, cannot be excluded.
+  opt-out rules are included by default but can be excluded.
   opt-in rules as excluded by default and can be included.
 
 * Add new pre-commit hook for towncrier.
