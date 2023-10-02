@@ -89,6 +89,14 @@ def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
     )
 
     parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        default=False,
+        help="Overwrite existing hook configuration files "
+        "(default: False, meaning exisitng files are not overwritten).",
+    )
+
+    parser.add_argument(
         "--dest",
         default=".",
         help="The destination folder to install the pre-commit configurations files into "
@@ -433,7 +441,10 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
             arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
             pre_commit_config += hook.pre_commit_config if arg else ""
     pre_commit_config_filename = pathlib.Path(dest) / PRE_COMMIT_CONFIG_FILE_NAME
-    print(f"Creating {pre_commit_config_filename}.")
+    create_overwrite = "Creating"
+    if pre_commit_config_filename.exists():
+        create_overwrite = "Overwriting existing"
+    print(f"{create_overwrite} {pre_commit_config_filename}.")
     with open(pre_commit_config_filename, "w") as f:
         f.write(pre_commit_config)
 
@@ -450,29 +461,34 @@ def create_config_files(args: types.SimpleNamespace) -> None:
         path to create them in.
     """
     dest = _get_dest(args=args)
+    overwrite = True if "overwrite" in vars(args) and args.overwrite else False
     for hook_name in registry:
         hook = registry[hook_name]
         if hook.config_file_name:
+            hook_config_file_name = dest / hook.config_file_name
+            if hook_config_file_name.exists() and not overwrite:
+                print(f"Not overwriting existing {hook_config_file_name}")
+                continue
+            create_overwrite = "Creating"
+            if hook_config_file_name.exists():
+                create_overwrite = "Overwriting existing"
             if hook.rule_type == RuleType.MANDATORY:
                 assert hook.config is not None
-                hook_config_file_name = dest / hook.config_file_name
-                print(f"Creating {hook_config_file_name}.")
+                print(f"{create_overwrite} {hook_config_file_name}.")
                 with open(hook_config_file_name, "w") as f:
                     f.write(hook.config)
             elif hook.rule_type == RuleType.OPT_OUT:
                 arg = getattr(args, f"no_{hook_name}", False)
                 if not arg:
                     assert hook.config is not None
-                    hook_config_file_name = dest / hook.config_file_name
-                    print(f"Creating {hook_config_file_name}.")
+                    print(f"{create_overwrite} {hook_config_file_name}.")
                     with open(dest / hook.config_file_name, "w") as f:
                         f.write(hook.config)
             elif hook.rule_type == RuleType.OPT_IN:
                 arg = getattr(args, f"with_{hook_name}", False)
                 if arg:
                     assert hook.config is not None
-                    hook_config_file_name = dest / hook.config_file_name
-                    print(f"Creating {hook_config_file_name}.")
+                    print(f"{create_overwrite} {hook_config_file_name}.")
                     with open(dest / hook.config_file_name, "w") as f:
                         f.write(hook.config)
 
