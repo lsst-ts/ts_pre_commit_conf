@@ -79,6 +79,7 @@ registry = {
     hooks:
       - id: black
 """,
+        rule_type=RuleType.MANDATORY,
     ),
     "clang-format": PreCommitHookMetadata(
         config_file_name=".clang-format",
@@ -113,6 +114,7 @@ exclude = __init__.py
     hooks:
       - id: flake8
 """,
+        rule_type=RuleType.MANDATORY,
     ),
     "format-xmllint": PreCommitHookMetadata(
         pre_commit_config="""
@@ -135,6 +137,7 @@ profile=black
       - id: isort
         name: isort (python)
 """,
+        rule_type=RuleType.MANDATORY,
     ),
     "mypy": PreCommitHookMetadata(
         config_file_name=".mypy.ini",
@@ -161,6 +164,7 @@ exclude = version.py
         exclude: conda/meta.yaml
       - id: check-xml
 """,
+        rule_type=RuleType.MANDATORY,
     ),
     "ruff": PreCommitHookMetadata(
         config_file_name=".ruff.toml",
