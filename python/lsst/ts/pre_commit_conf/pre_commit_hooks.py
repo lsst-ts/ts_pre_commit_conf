@@ -177,7 +177,7 @@ convention = "numpy"
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.289
+    rev: v0.0.291
     hooks:
       - id: ruff
 """,
