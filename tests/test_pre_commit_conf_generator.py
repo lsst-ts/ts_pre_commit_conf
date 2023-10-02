@@ -304,6 +304,45 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             expected_hook_names=expected_hook_names, no_mypy=True
         )
 
+    def validate_overwrite(self, **kwargs: bool) -> None:
+        """Validate that the existing hook config files are overwritten on not
+        depending on the presence of the 'overwrite' argument.
+
+        Parameters
+        ----------
+        kwargs : `bool`
+            Boolean values that indicate whether hook config files should be
+            overwritten or not.
+        """
+        args = self.create_args(**kwargs)
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            # Set destination path to avoid left over files from running the
+            # unit tests.
+            args.dest = tmpdirname
+
+            flake8_hook = pre_commit_conf.registry["flake8"]
+            flake8_hook_config_file_name = (
+                pathlib.Path(tmpdirname) / flake8_hook.config_file_name
+            )
+            with open(flake8_hook_config_file_name, "w") as f:
+                f.write(flake8_hook.config)
+                # Add an extra line so we can verify whether the file was
+                # overwritten or not.
+                f.write("test = true")
+
+            pre_commit_conf.create_config_files(args=args)
+
+            with open(flake8_hook_config_file_name, "r") as f:
+                flake8_lines = f.read()
+                if "overwrite" in kwargs:
+                    assert flake8_lines == flake8_hook.config
+                else:
+                    assert flake8_lines != flake8_hook.config
+
+    async def test_overwrite(self) -> None:
+        self.validate_overwrite()
+        self.validate_overwrite(overwrite=True)
+
     def validate_dot_gitignore(self, **kwargs: bool) -> None:
         """Validate the generated .gitignore file.
 
