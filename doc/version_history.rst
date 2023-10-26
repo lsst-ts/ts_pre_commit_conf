@@ -6,6 +6,18 @@
 Version History
 ###############
 
+v0.9.1
+======
+
+Update the versions of the following hooks:
+
+  * black
+  * clang-format
+  * mypy
+  * pre-commit-hooks
+  * ruff
+  * towncrier
+
 v0.9.0
 ======
 
