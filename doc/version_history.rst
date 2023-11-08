@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.9.2
+======
+
+* Make sure that .pre-commit-config.yaml doesn't get overwritten unless --overwrite is specified.
+
 v0.9.1
 ======
 
