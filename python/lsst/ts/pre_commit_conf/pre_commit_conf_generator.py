@@ -429,6 +429,7 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
         The args that determine the contents and the destination path.
     """
     dest = _get_dest(args=args)
+    overwrite = True if "overwrite" in vars(args) and args.overwrite else False
     pre_commit_config = "repos:"
     for hook_name in registry:
         hook = registry[hook_name]
@@ -441,12 +442,15 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
             arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
             pre_commit_config += hook.pre_commit_config if arg else ""
     pre_commit_config_filename = pathlib.Path(dest) / PRE_COMMIT_CONFIG_FILE_NAME
-    create_overwrite = "Creating"
-    if pre_commit_config_filename.exists():
-        create_overwrite = "Overwriting existing"
-    print(f"{create_overwrite} {pre_commit_config_filename}.")
-    with open(pre_commit_config_filename, "w") as f:
-        f.write(pre_commit_config)
+    if pre_commit_config_filename.exists() and not overwrite:
+        print(f"Not overwriting existing {pre_commit_config_filename}")
+    else:
+        create_overwrite = "Creating"
+        if pre_commit_config_filename.exists():
+            create_overwrite = "Overwriting existing"
+        print(f"{create_overwrite} {pre_commit_config_filename}.")
+        with open(pre_commit_config_filename, "w") as f:
+            f.write(pre_commit_config)
 
 
 def create_config_files(args: types.SimpleNamespace) -> None:
