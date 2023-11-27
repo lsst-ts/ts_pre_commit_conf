@@ -75,7 +75,7 @@ registry = {
     "black": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/psf/black
-    rev: 23.10.1
+    rev: 23.11.0
     hooks:
       - id: black
 """,
@@ -94,7 +94,7 @@ ContinuationIndentWidth: 8
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v17.0.3
+    rev: v17.0.5
     hooks:
       - id: clang-format
 """,
@@ -148,7 +148,7 @@ exclude = version.py
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.6.1
+    rev: v1.7.1
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML==6]
@@ -181,7 +181,7 @@ convention = "numpy"
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.2
+    rev: v0.1.6
     hooks:
       - id: ruff
 """,
@@ -190,7 +190,7 @@ convention = "numpy"
     "towncrier": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/twisted/towncrier
-    rev: 23.10.0
+    rev: 23.11.0
     hooks:
       - id: towncrier-check
       """,
