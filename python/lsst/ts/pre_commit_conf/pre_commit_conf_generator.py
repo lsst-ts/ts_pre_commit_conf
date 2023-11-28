@@ -482,14 +482,14 @@ def create_config_files(args: types.SimpleNamespace) -> None:
                 with open(hook_config_file_name, "w") as f:
                     f.write(hook.config)
             elif hook.rule_type == RuleType.OPT_OUT:
-                arg = getattr(args, f"no_{hook_name}", False)
+                arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
                 if not arg:
                     assert hook.config is not None
                     print(f"{create_overwrite} {hook_config_file_name}.")
                     with open(dest / hook.config_file_name, "w") as f:
                         f.write(hook.config)
             elif hook.rule_type == RuleType.OPT_IN:
-                arg = getattr(args, f"with_{hook_name}", False)
+                arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
                 if arg:
                     assert hook.config is not None
                     print(f"{create_overwrite} {hook_config_file_name}.")
