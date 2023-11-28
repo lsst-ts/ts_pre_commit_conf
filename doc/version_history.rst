@@ -6,6 +6,12 @@
 Version History
 ###############
 
+v0.9.3
+======
+
+* Update the versions of several hooks.
+* Make sure that hook config files get created/overwritten or skipped for hooks with "-" in the name.
+
 v0.9.2
 ======
 
