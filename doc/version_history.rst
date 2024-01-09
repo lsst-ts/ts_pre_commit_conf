@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.9.4
+======
+
+* Add types-python-dateutils to mypy additional_dependencies.
+
 v0.9.3
 ======
 
