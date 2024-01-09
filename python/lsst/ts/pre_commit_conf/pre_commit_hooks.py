@@ -151,7 +151,7 @@ exclude = version.py
     rev: v1.7.1
     hooks:
       - id: mypy
-        additional_dependencies: [types-PyYAML==6]
+        additional_dependencies: [types-PyYAML==6, types-python-dateutil>=2]
 """,
         rule_type=RuleType.OPT_OUT,
     ),
