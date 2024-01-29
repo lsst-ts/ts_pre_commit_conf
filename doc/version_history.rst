@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.9.5
+======
+
+* Update the versions of several hooks.
+
 v0.9.4
 ======
 

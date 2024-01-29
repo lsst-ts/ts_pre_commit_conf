@@ -75,7 +75,7 @@ registry = {
     "black": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/psf/black
-    rev: 23.11.0
+    rev: 24.1.1
     hooks:
       - id: black
 """,
@@ -94,7 +94,7 @@ ContinuationIndentWidth: 8
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v17.0.5
+    rev: v17.0.6
     hooks:
       - id: clang-format
 """,
@@ -132,7 +132,7 @@ profile=black
 """,
         pre_commit_config="""
   - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
       - id: isort
         name: isort (python)
@@ -148,7 +148,7 @@ exclude = version.py
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.8.0
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML==6, types-python-dateutil>=2]
@@ -181,7 +181,7 @@ convention = "numpy"
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.6
+    rev: v0.1.14
     hooks:
       - id: ruff
 """,
