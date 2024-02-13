@@ -25,6 +25,7 @@ __all__ = [
     "TS_PRE_COMMIT_CONFIG_YAML",
     "create_config_files",
     "create_or_report_missing_config_file",
+    "determine_arg",
     "generate_pre_commit_conf",
     "generate_pre_commit_conf_file",
     "parse_args",
@@ -195,6 +196,22 @@ def create_or_report_missing_config_file(args: types.SimpleNamespace) -> None:
         sys.exit(1)
 
 
+def determine_arg(args: types.SimpleNamespace, hook_name: str) -> bool:
+    # If the rule is opt-out, the arg name prefix is "no"; if the rule
+    # is opt-in it is "with".
+    hook = registry[hook_name]
+    hook_arg_name_prefix = "no" if hook.rule_type == RuleType.OPT_OUT else "with"
+    arg = getattr(
+        args,
+        f"{hook_arg_name_prefix}_{hook_name.replace('-', '_')}",
+        hook.rule_type == RuleType.OPT_IN,
+    )
+    # need to flip the boolean if this rule is opt_in.
+    if hook.rule_type == RuleType.OPT_IN:
+        arg = not arg
+    return arg
+
+
 def _create_config_file(args: types.SimpleNamespace) -> None:
     """Create a .ts_pre_commit_config.yaml config file with contents based on
     the provided arguments.
@@ -218,21 +235,13 @@ def _create_config_file(args: types.SimpleNamespace) -> None:
         if hook.rule_type == RuleType.MANDATORY:
             lines.append(f"{hook_name}: true")
         else:
-            # If the rule is opt-out, the arg name prefix is "no", of the rule
-            # is opt-in it is "with".
-            hook_arg_name_prefix = (
-                "no" if hook.rule_type == RuleType.OPT_OUT else "with"
-            )
-            arg = getattr(
-                args,
-                f"{hook_arg_name_prefix}_{hook_name.replace('-', '_')}",
-                hook.rule_type == RuleType.OPT_IN,
-            )
-            # need to flip the boolean if this rule is opt_in.
-            if hook.rule_type == RuleType.OPT_IN:
-                arg = not arg
+            arg = determine_arg(args, hook_name)
             lines.append(f"{hook_name}: {'true' if arg is False else 'false'}")
     lines = sorted(lines)
+    _write_ts_pre_commit_config_yaml(dest, lines)
+
+
+def _write_ts_pre_commit_config_yaml(dest: pathlib.Path, lines: list[str]) -> None:
     with open(dest / TS_PRE_COMMIT_CONFIG_YAML, "w") as f:
         for line in lines:
             f.write(f"{line}\n")
@@ -316,9 +325,6 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
         config = yaml.safe_load(f)
 
     hook_names = []
-    missing_hooks = []
-    incorrect_config_options = []
-    additional_hooks = []
     for hook_name in registry:
         if hook_name == "pre-commit-hooks":
             hook_names.append("check-yaml")
@@ -328,53 +334,15 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
 
     # Check if all hooks are in the .ts_pre_commit_config.yaml config file,
     # except possibly for the optional ones.
-    for hook_name in hook_names:
-        missing = True
-        for option in config:
-            if option == hook_name:
-                missing = False
-                break
-
-        # Make sure to skip check-yaml and check-xml.
-        if hook_name not in registry:
-            continue
-
-        hook = registry[hook_name]
-        if hook.rule_type != RuleType.MANDATORY:
-            missing = False
-        if missing:
-            missing_hooks.append(hook_name)
+    missing_hooks = _check_missing_hooks(config, hook_names)
 
     # Check if all mandatory hooks are in the .ts_pre_commit_config.yaml config
     # file.
-    for hook_name in hook_names:
-        # Make sure to skip check-yaml and check-xml.
-        if hook_name not in registry:
-            continue
-
-        # Skip optional hooks.
-        hook = registry[hook_name]
-        if hook.rule_type != RuleType.MANDATORY:
-            continue
-
-        incorrect_config_option = True
-        for option in config:
-            if option == hook_name and config[option] is True:
-                incorrect_config_option = False
-                break
-        if incorrect_config_option:
-            incorrect_config_options.append(hook_name)
+    incorrect_config_options = _check_incorrect_config_options(config, hook_names)
 
     # Check that no superfluous hooks are in the .ts_pre_commit_config.yaml
     # config file.
-    for option in config:
-        additional_hook = True
-        for hook_name in hook_names:
-            if option == hook_name:
-                additional_hook = False
-                continue
-        if additional_hook:
-            additional_hooks.append(option)
+    additional_hooks = _check_additional_hooks(config, hook_names)
 
     exit_messages = []
     if missing_hooks:
@@ -393,6 +361,61 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
 
     if missing_hooks or incorrect_config_options or additional_hooks:
         raise ValueError("\n".join(exit_messages))
+
+
+def _check_missing_hooks(config: dict, hook_names: list[str]) -> list[str]:
+    missing_hooks = []
+    for hook_name in hook_names:
+        missing = True
+        for option in config:
+            if option == hook_name:
+                missing = False
+                break
+
+        # Make sure to skip check-yaml and check-xml.
+        if hook_name not in registry:
+            continue
+
+        hook = registry[hook_name]
+        if hook.rule_type != RuleType.MANDATORY:
+            missing = False
+        if missing:
+            missing_hooks.append(hook_name)
+    return missing_hooks
+
+
+def _check_incorrect_config_options(config: dict, hook_names: list[str]) -> list[str]:
+    incorrect_config_options = []
+    for hook_name in hook_names:
+        # Make sure to skip check-yaml and check-xml.
+        if hook_name not in registry:
+            continue
+
+        # Skip optional hooks.
+        hook = registry[hook_name]
+        if hook.rule_type != RuleType.MANDATORY:
+            continue
+
+        incorrect_config_option = True
+        for option in config:
+            if option == hook_name and config[option] is True:
+                incorrect_config_option = False
+                break
+        if incorrect_config_option:
+            incorrect_config_options.append(hook_name)
+    return incorrect_config_options
+
+
+def _check_additional_hooks(config: dict, hook_names: list[str]) -> list[str]:
+    additional_hooks = []
+    for option in config:
+        additional_hook = True
+        for hook_name in hook_names:
+            if option == hook_name:
+                additional_hook = False
+        if additional_hook:
+            additional_hooks.append(option)
+    return additional_hooks
 
 
 def update_args_from_config_file(args: types.SimpleNamespace) -> None:
@@ -442,6 +465,14 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
             arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
             pre_commit_config += hook.pre_commit_config if arg else ""
     pre_commit_config_filename = pathlib.Path(dest) / PRE_COMMIT_CONFIG_FILE_NAME
+    _write_pre_commit_config_file(
+        overwrite, pre_commit_config, pre_commit_config_filename
+    )
+
+
+def _write_pre_commit_config_file(
+    overwrite: bool, pre_commit_config: str, pre_commit_config_filename: pathlib.Path
+) -> None:
     if pre_commit_config_filename.exists() and not overwrite:
         print(f"Not overwriting existing {pre_commit_config_filename}")
     else:
@@ -476,25 +507,60 @@ def create_config_files(args: types.SimpleNamespace) -> None:
             create_overwrite = "Creating"
             if hook_config_file_name.exists():
                 create_overwrite = "Overwriting existing"
-            if hook.rule_type == RuleType.MANDATORY:
-                assert hook.config is not None
-                print(f"{create_overwrite} {hook_config_file_name}.")
-                with open(hook_config_file_name, "w") as f:
-                    f.write(hook.config)
-            elif hook.rule_type == RuleType.OPT_OUT:
-                arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
-                if not arg:
-                    assert hook.config is not None
-                    print(f"{create_overwrite} {hook_config_file_name}.")
-                    with open(dest / hook.config_file_name, "w") as f:
-                        f.write(hook.config)
-            elif hook.rule_type == RuleType.OPT_IN:
-                arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
-                if arg:
-                    assert hook.config is not None
-                    print(f"{create_overwrite} {hook_config_file_name}.")
-                    with open(dest / hook.config_file_name, "w") as f:
-                        f.write(hook.config)
+
+            match hook.rule_type:
+                case RuleType.MANDATORY:
+                    _write_mandatory(hook_name, hook_config_file_name, create_overwrite)
+                case RuleType.OPT_OUT:
+                    _write_opt_in(
+                        args, hook_name, hook_config_file_name, create_overwrite
+                    )
+                case RuleType.OPT_IN:
+                    _write_opt_out(
+                        args, hook_name, hook_config_file_name, create_overwrite
+                    )
+
+
+def _write_mandatory(
+    hook_name: str,
+    hook_config_file_name: pathlib.Path,
+    create_overwrite: str,
+) -> None:
+    hook = registry[hook_name]
+    assert hook.config is not None
+    print(f"{create_overwrite} {hook_config_file_name}.")
+    with open(hook_config_file_name, "w") as f:
+        f.write(hook.config)
+
+
+def _write_opt_in(
+    args: types.SimpleNamespace,
+    hook_name: str,
+    hook_config_file_name: pathlib.Path,
+    create_overwrite: str,
+) -> None:
+    hook = registry[hook_name]
+    arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
+    if not arg:
+        assert hook.config is not None
+        print(f"{create_overwrite} {hook_config_file_name}.")
+        with open(hook_config_file_name, "w") as f:
+            f.write(hook.config)
+
+
+def _write_opt_out(
+    args: types.SimpleNamespace,
+    hook_name: str,
+    hook_config_file_name: pathlib.Path,
+    create_overwrite: str,
+) -> None:
+    hook = registry[hook_name]
+    arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
+    if arg:
+        assert hook.config is not None
+        print(f"{create_overwrite} {hook_config_file_name}.")
+        with open(hook_config_file_name, "w") as f:
+            f.write(hook.config)
 
 
 def update_dot_gitignore(args: types.SimpleNamespace) -> None:
@@ -517,15 +583,19 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
     with open(dot_gitignore) as f:
         dot_gitignore_contents = f.read()
     with open(dot_gitignore, "a") as f:
-        if len(dot_gitignore_contents) > 0 and not dot_gitignore_contents[-1] == "\n":
+        if len(dot_gitignore_contents) > 0 and dot_gitignore_contents[-1] != "\n":
             f.write("\n")
         if PRE_COMMIT_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
         for hook_name in registry:
             hook = registry[hook_name]
+            include = True
+            if hook.rule_type != RuleType.MANDATORY:
+                include = determine_arg(args, hook_name)
             if (
                 hook.config_file_name
                 and hook.config_file_name not in dot_gitignore_contents
+                and include
             ):
                 f.write(f"{hook.config_file_name}\n")
 
@@ -566,7 +636,7 @@ async def run_pre_commit_install(args: types.SimpleNamespace) -> None:
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    stdout, stderr = await process.communicate()
+    stdout, _ = await process.communicate()
     message = stdout.decode().strip()
 
     # Return to the original working directory.

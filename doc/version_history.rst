@@ -6,6 +6,12 @@
 Version History
 ###############
 
+v0.9.6
+======
+
+* Code improvements following SonarLint.
+* Make sure that not-included hooks do not get added to gitignore.
+
 v0.9.5
 ======
 
