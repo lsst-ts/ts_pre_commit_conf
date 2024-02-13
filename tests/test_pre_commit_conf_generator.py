@@ -45,7 +45,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
 
         # Specifying --no-mypy without --create results in a ValueError.
         with pytest.raises(ValueError):
-            args = pre_commit_conf.parse_args(command_line_args=["--no-mypy"])
+            pre_commit_conf.parse_args(command_line_args=["--no-mypy"])
 
         args = pre_commit_conf.parse_args(command_line_args=["--no-mypy", "--create"])
         assert args.no_mypy is True
@@ -368,10 +368,20 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                 generated_dot_gitignore = f.read()
             for hook_name in pre_commit_conf.registry:
                 if pre_commit_conf.registry[hook_name].config_file_name:
-                    assert (
-                        pre_commit_conf.registry[hook_name].config_file_name
-                        in generated_dot_gitignore
-                    )
+                    include = True
+                    hook = pre_commit_conf.registry[hook_name]
+                    if hook.rule_type != pre_commit_conf.RuleType.MANDATORY:
+                        include = pre_commit_conf.determine_arg(args, hook_name)
+                    if include:
+                        assert (
+                            pre_commit_conf.registry[hook_name].config_file_name
+                            in generated_dot_gitignore
+                        )
+                    else:
+                        assert (
+                            pre_commit_conf.registry[hook_name].config_file_name
+                            not in generated_dot_gitignore
+                        )
 
     async def test_update_dot_gitignore(self) -> None:
         # Nominal cases where all pre-commit hooks are included. Note that the
