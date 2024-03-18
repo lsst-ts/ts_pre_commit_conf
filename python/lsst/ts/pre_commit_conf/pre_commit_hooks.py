@@ -75,7 +75,7 @@ registry = {
     "black": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/psf/black
-    rev: 24.1.1
+    rev: 24.3.0
     hooks:
       - id: black
 """,
@@ -94,7 +94,7 @@ ContinuationIndentWidth: 8
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v17.0.6
+    rev: v18.1.1
     hooks:
       - id: clang-format
 """,
@@ -110,7 +110,7 @@ exclude = __init__.py
 """,
         pre_commit_config="""
   - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
       - id: flake8
 """,
@@ -148,7 +148,7 @@ exclude = version.py
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+    rev: v1.9.0
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML==6, types-python-dateutil>=2]
@@ -181,7 +181,7 @@ convention = "numpy"
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.14
+    rev: v0.3.3
     hooks:
       - id: ruff
 """,
