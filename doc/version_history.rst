@@ -6,6 +6,17 @@
 Version History
 ###############
 
+v0.9.7
+======
+
+* Update the versions of the following hooks:
+
+  * black
+  * clang-format
+  * flake8
+  * mypy
+  * ruff
+
 v0.9.6
 ======
 
