@@ -94,7 +94,7 @@ ContinuationIndentWidth: 8
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v18.1.1
+    rev: v18.1.3
     hooks:
       - id: clang-format
 """,
@@ -158,7 +158,7 @@ exclude = version.py
     "pre-commit-hooks": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-yaml
         exclude: conda/meta.yaml
@@ -181,7 +181,7 @@ convention = "numpy"
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.3
+    rev: v0.3.5
     hooks:
       - id: ruff
 """,
@@ -201,7 +201,7 @@ filename = "doc/version_history.rst"
 directory = "doc/news"
 filename_format = "{name}.{type}.rst|{name}.{type}.md"
 title_format = "{version} ({project_date})"
-issue_format = "`{issue} <https://jira.lsstcorp.org/browse/{issue}>`_"
+issue_format = "`{issue} <https://rubinobs.atlassian.net//browse/{issue}>`_"
 
 [[tool.towncrier.type]]
     directory = "feature"
