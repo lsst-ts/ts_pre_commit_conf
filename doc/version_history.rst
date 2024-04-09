@@ -6,6 +6,12 @@
 Version History
 ###############
 
+v0.9.9
+======
+
+* Update the Jira URL in the towncrier configuration.
+* Update the versions of the clang, pre-commit and ruff hooks.
+
 v0.9.8
 ======
 
