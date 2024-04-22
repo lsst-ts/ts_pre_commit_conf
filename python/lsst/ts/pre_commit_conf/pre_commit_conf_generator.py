@@ -589,15 +589,16 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
         for hook_name in registry:
             hook = registry[hook_name]
-            include = True
-            if hook.rule_type != RuleType.MANDATORY:
-                include = determine_arg(args, hook_name)
-            if (
-                hook.config_file_name
-                and hook.config_file_name not in dot_gitignore_contents
-                and include
-            ):
+            if hook.rule_type == RuleType.MANDATORY and hook.config_file_name:
                 f.write(f"{hook.config_file_name}\n")
+            elif hook.rule_type == RuleType.OPT_OUT and hook.config_file_name:
+                arg = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
+                if not arg:
+                    f.write(f"{hook.config_file_name}\n")
+            elif hook.rule_type == RuleType.OPT_IN and hook.config_file_name:
+                arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
+                if arg:
+                    f.write(f"{hook.config_file_name}\n")
 
 
 async def run_pre_commit_install(args: types.SimpleNamespace) -> None:
