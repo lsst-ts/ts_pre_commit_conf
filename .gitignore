@@ -17,14 +17,11 @@ pytest_session.txt
 # Python cache
 __pycache__/
 
+# pypi files
+*.egg-info/
+
 .pre-commit-config.yaml
-.clang-format
 .flake8
 .isort.cfg
 .mypy.ini
 .ruff.toml
-
-# pypi files
-
-*.egg-info/
-towncrier.toml
