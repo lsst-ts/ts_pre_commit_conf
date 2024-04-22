@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.9.10
+=======
+
+* Remove reference to mamba from README.
+
 v0.9.9
 ======
 
