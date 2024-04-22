@@ -370,8 +370,20 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                 if pre_commit_conf.registry[hook_name].config_file_name:
                     include = True
                     hook = pre_commit_conf.registry[hook_name]
-                    if hook.rule_type != pre_commit_conf.RuleType.MANDATORY:
-                        include = pre_commit_conf.determine_arg(args, hook_name)
+                    if (
+                        hook.rule_type == pre_commit_conf.RuleType.OPT_OUT
+                        and hook.config_file_name
+                    ):
+                        include = not getattr(
+                            args, f"no_{hook_name.replace('-', '_')}", False
+                        )
+                    elif (
+                        hook.rule_type == pre_commit_conf.RuleType.OPT_IN
+                        and hook.config_file_name
+                    ):
+                        include = getattr(
+                            args, f"no_{hook_name.replace('-', '_')}", False
+                        )
                     if include:
                         assert (
                             pre_commit_conf.registry[hook_name].config_file_name
@@ -382,6 +394,9 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                             pre_commit_conf.registry[hook_name].config_file_name
                             not in generated_dot_gitignore
                         )
+            # Make sure that no entries were added for hooks without a config
+            # file.
+            assert "None" not in generated_dot_gitignore
 
     async def test_update_dot_gitignore(self) -> None:
         # Nominal cases where all pre-commit hooks are included. Note that the

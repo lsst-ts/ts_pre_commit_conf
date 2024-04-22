@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.9.11
+=======
+
+* Make sure that unused hook config file names do not show up in .gitignore anymore.
+
 v0.9.10
 =======
 
