@@ -6,6 +6,11 @@
 Version History
 ###############
 
+v0.9.12
+=======
+
+* Make sure that existing hook config file names are not added to .gitignore a second time.
+
 v0.9.11
 =======
 

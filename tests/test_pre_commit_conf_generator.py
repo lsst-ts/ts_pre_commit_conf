@@ -360,7 +360,10 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             # unit tests.
             args.dest = tmpdirname
 
+            # Execute twice to ensure that no duplicate entries are added.
             pre_commit_conf.update_dot_gitignore(args=args)
+            pre_commit_conf.update_dot_gitignore(args=args)
+
             dot_gitignore_file = (
                 pathlib.Path(tmpdirname) / pre_commit_conf.DOT_GITIGNORE
             )
@@ -385,10 +388,17 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                             args, f"no_{hook_name.replace('-', '_')}", False
                         )
                     if include:
-                        assert (
-                            pre_commit_conf.registry[hook_name].config_file_name
-                            in generated_dot_gitignore
+                        hook_config_file_name = pre_commit_conf.registry[
+                            hook_name
+                        ].config_file_name
+                        assert hook_config_file_name is not None
+                        assert hook_config_file_name in generated_dot_gitignore
+                        # Remove the hook config file name to ensure that it
+                        # only is included once.
+                        generated_dot_gitignore = generated_dot_gitignore.replace(
+                            hook_config_file_name, ""
                         )
+                        assert hook_config_file_name not in generated_dot_gitignore
                     else:
                         assert (
                             pre_commit_conf.registry[hook_name].config_file_name

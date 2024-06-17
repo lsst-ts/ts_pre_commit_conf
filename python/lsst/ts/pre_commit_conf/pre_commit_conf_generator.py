@@ -589,6 +589,11 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
         for hook_name in registry:
             hook = registry[hook_name]
+            if (
+                hook.config_file_name is None
+                or hook.config_file_name in dot_gitignore_contents
+            ):
+                continue
             if hook.rule_type == RuleType.MANDATORY and hook.config_file_name:
                 f.write(f"{hook.config_file_name}\n")
             elif hook.rule_type == RuleType.OPT_OUT and hook.config_file_name:
