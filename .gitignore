@@ -25,3 +25,4 @@ __pycache__/
 .isort.cfg
 .mypy.ini
 .ruff.toml
+towncrier.toml

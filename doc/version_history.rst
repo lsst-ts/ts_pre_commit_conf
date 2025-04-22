@@ -6,6 +6,13 @@
 Version History
 ###############
 
+.. towncrier release notes start
+
+v0.9.14
+=======
+
+* Update the versions of the black, clang-format, flake8, isort, mypy, pre-commit-hooks, ruff and towncrier hooks.
+
 v0.9.13
 =======
 
