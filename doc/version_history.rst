@@ -6,6 +6,26 @@
 Version History
 ###############
 
+v0.9.14 (2025-04-22)
+====================
+
+New Features
+------------
+
+- Switched to towncrier. (`DM-48659 <https://rubinobs.atlassian.net//browse/DM-48659>`_)
+
+
+Bug Fixes
+---------
+
+- Fixed package version module generation. (`DM-48659 <https://rubinobs.atlassian.net//browse/DM-48659>`_)
+
+
+Performance Enhancement
+-----------------------
+
+- Update the versions of the black, clang-format, flake8, isort, mypy, pre-commit-hooks, ruff and towncrier hooks. (`DM-48659 <https://rubinobs.atlassian.net//browse/DM-48659>`_)
+
 .. towncrier release notes start
 
 v0.9.14

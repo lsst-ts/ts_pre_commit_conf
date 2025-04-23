@@ -1,1 +1,0 @@
-Update the versions of the black, clang-format, flake8, isort, mypy, pre-commit-hooks, ruff and towncrier hooks.
