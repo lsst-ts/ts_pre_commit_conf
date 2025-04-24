@@ -1,0 +1,1 @@
+Disable black, flake8 and isort if ruff enabled.

@@ -91,7 +91,11 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                     # This hook is not part of TS_PRE_COMMIT_CONFIG_YAML.
                     continue
                 assert hook_name in config
-                assert f"{hook_name}: true" in config
+                # black, flake8 and isort disabled if ruff enabled.
+                if hook_name in ["black", "flake8", "isort"]:
+                    assert f"{hook_name}: false" in config
+                else:
+                    assert f"{hook_name}: true" in config
 
     async def test_validate_config_file_contents(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdirname:
