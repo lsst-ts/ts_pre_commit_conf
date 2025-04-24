@@ -124,13 +124,19 @@ def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
                 "--create to be specified as well.",
             )
         elif hook.rule_type == RuleType.OPT_IN:
+            help_message = (
+                f"Include {hook_name} in the pre-commit configuration. (default: False, meaning {hook_name} "
+                "is not included). This options requires --create to be specified as well."
+            )
+            if hook_name == "ruff":
+                help_message += (
+                    f" Enabling {hook_name} will disable black, flake8 and isort."
+                )
             parser.add_argument(
                 f"--with-{hook_name}",
                 action="store_true",
                 default=False,
-                help=f"Include {hook_name} in the pre-commit configuration. "
-                f"(default: False, meaning {hook_name} is not included). This options requires "
-                "--create to be specified as well.",
+                help=help_message,
             )
 
     args = parser.parse_args(command_line_args)
@@ -237,7 +243,16 @@ def _create_config_file(args: types.SimpleNamespace) -> None:
         else:
             arg = determine_arg(args, hook_name)
             lines.append(f"{hook_name}: {'true' if arg is False else 'false'}")
+
+    # Disable black, flake8 and isort if ruff is enabled.
+    if "ruff: true" in lines:
+        for hook_name in ["black", "flake8", "isort"]:
+            if f"{hook_name}: true" in lines:
+                lines.remove(f"{hook_name}: true")
+                lines.append(f"{hook_name}: false")
+
     lines = sorted(lines)
+
     _write_ts_pre_commit_config_yaml(dest, lines)
 
 
@@ -290,17 +305,17 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
     """Validate the contents of the .ts_pre_commit_config.yaml config file. The
     following pre-commit hooks need to be present in the config file:
 
-        check-yaml
-        check-xml
-        clang-format
         black
+        check-xml
+        check-yaml
+        clang-format
         flake8
         isort
         mypy
+        ruff
+        towncrier
 
-    All pre-commit hooks are mandatory, so all need to be set to "yes", with
-    the exception of mypy, which may be set to "no". No additional pre-commit
-    hooks may be defined.
+    Either black, flake8 and isort are mandatory or ruff.
 
     Parameters
     ----------
@@ -401,6 +416,10 @@ def _check_incorrect_config_options(config: dict, hook_names: list[str]) -> list
             if option == hook_name and config[option] is True:
                 incorrect_config_option = False
                 break
+        # Allow disabled black, flake8 and isort if ruff is enabled.
+        if hook_name in ["black", "flake8", "isort"]:
+            if "ruff" in config and config["ruff"] is True:
+                incorrect_config_option = False
         if incorrect_config_option:
             incorrect_config_options.append(hook_name)
     return incorrect_config_options
@@ -452,9 +471,15 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
         The args that determine the contents and the destination path.
     """
     dest = _get_dest(args=args)
-    overwrite = True if "overwrite" in vars(args) and args.overwrite else False
+    overwrite = "overwrite" in vars(args)
+    with_ruff = True if "with_ruff" in vars(args) and args.with_ruff is True else False
     pre_commit_config = "repos:"
+
     for hook_name in registry:
+        # Avoid black, flake8 and isort if ruff enabled.
+        if hook_name in ["black", "flake8", "isort"] and with_ruff:
+            continue
+
         hook = registry[hook_name]
         if hook.rule_type == RuleType.MANDATORY:
             pre_commit_config += hook.pre_commit_config
@@ -496,8 +521,13 @@ def create_config_files(args: types.SimpleNamespace) -> None:
         path to create them in.
     """
     dest = _get_dest(args=args)
-    overwrite = True if "overwrite" in vars(args) and args.overwrite else False
+    overwrite = "overwrite" in vars(args)
+    with_ruff = True if "with_ruff" in vars(args) and args.with_ruff is True else False
     for hook_name in registry:
+        # Avoid black, flake8 and isort if ruff enabled.
+        if hook_name in ["black", "flake8", "isort"] and with_ruff:
+            continue
+
         hook = registry[hook_name]
         if hook.config_file_name:
             hook_config_file_name = dest / hook.config_file_name
