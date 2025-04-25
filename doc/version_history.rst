@@ -6,6 +6,18 @@
 Version History
 ###############
 
+.. towncrier release notes start
+
+
+v0.9.15 (2025-04-24)
+====================
+
+New Features
+------------
+
+- Disable black, flake8 and isort if ruff enabled. (`DM-50424 <https://rubinobs.atlassian.net//browse/DM-50424>`_)
+
+
 v0.9.14 (2025-04-22)
 ====================
 
@@ -26,7 +38,6 @@ Performance Enhancement
 
 - Update the versions of the black, clang-format, flake8, isort, mypy, pre-commit-hooks, ruff and towncrier hooks. (`DM-48659 <https://rubinobs.atlassian.net//browse/DM-48659>`_)
 
-.. towncrier release notes start
 
 v0.9.14
 =======
