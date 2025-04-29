@@ -8,6 +8,14 @@ Version History
 
 .. towncrier release notes start
 
+v0.9.16 (2025-04-29)
+====================
+
+Bug Fixes
+---------
+
+- Fixed handling of 'overwrite' argument. (`DM-50537 <https://rubinobs.atlassian.net//browse/DM-50537>`_)
+
 
 v0.9.15 (2025-04-24)
 ====================
