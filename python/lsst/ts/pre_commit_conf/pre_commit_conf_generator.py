@@ -471,8 +471,12 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
         The args that determine the contents and the destination path.
     """
     dest = _get_dest(args=args)
-    overwrite = "overwrite" in vars(args)
-    with_ruff = True if "with_ruff" in vars(args) and args.with_ruff is True else False
+
+    # Both "overwrite" and "with_ruff" may be present and False, hence the
+    # complicated check.
+    overwrite = True if "overwrite" in vars(args) and args.overwrite else False
+    with_ruff = True if "with_ruff" in vars(args) and args.with_ruff else False
+
     pre_commit_config = "repos:"
 
     for hook_name in registry:
@@ -521,8 +525,12 @@ def create_config_files(args: types.SimpleNamespace) -> None:
         path to create them in.
     """
     dest = _get_dest(args=args)
-    overwrite = "overwrite" in vars(args)
-    with_ruff = True if "with_ruff" in vars(args) and args.with_ruff is True else False
+
+    # Both "overwrite" and "with_ruff" may be present and False, hence the
+    # complicated check.
+    overwrite = True if "overwrite" in vars(args) and args.overwrite else False
+    with_ruff = True if "with_ruff" in vars(args) and args.with_ruff else False
+
     for hook_name in registry:
         # Avoid black, flake8 and isort if ruff enabled.
         if hook_name in ["black", "flake8", "isort"] and with_ruff:
