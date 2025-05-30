@@ -235,4 +235,13 @@ issue_format = "`{issue} <https://rubinobs.atlassian.net//browse/{issue}>`_"
 """,
         rule_type=RuleType.OPT_IN,
     ),
+    "nbstripout": PreCommitHookMetadata(
+        pre_commit_config="""
+- repo: https://github.com/kynan/nbstripout
+  rev: v0.8.1
+  hooks:
+    - id: nbstripout
+""",
+    rule_type=RuleType.OPT_IN
+    )
 }
