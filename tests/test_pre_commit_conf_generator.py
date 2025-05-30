@@ -151,6 +151,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                 with_ruff=True,
                 with_towncrier=True,
                 with_format_xmllint=True,
+                with_nbstripout=True
             )
             orig_args = copy(args)
             config_path = (
