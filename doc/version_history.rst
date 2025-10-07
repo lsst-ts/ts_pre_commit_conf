@@ -8,6 +8,22 @@ Version History
 
 .. towncrier release notes start
 
+v0.9.17 (2025-10-07)
+====================
+
+New Features
+------------
+
+- Added nbstripout as opt-in hook. (`DM-50540 <https://rubinobs.atlassian.net//browse/DM-50540>`_)
+
+
+Performance Enhancement
+-----------------------
+
+- Updated ts-conda-build dependency version. (`OSW-1134 <https://rubinobs.atlassian.net//browse/OSW-1134>`_)
+- Updated all hook versions. (`OSW-1201 <https://rubinobs.atlassian.net//browse/OSW-1201>`_)
+
+
 v0.9.16 (2025-04-29)
 ====================
 
