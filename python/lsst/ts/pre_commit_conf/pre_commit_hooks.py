@@ -75,7 +75,7 @@ registry = {
     "black": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 25.9.0
     hooks:
       - id: black
 """,
@@ -94,7 +94,7 @@ ContinuationIndentWidth: 8
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v18.1.8
+    rev: v21.1.2
     hooks:
       - id: clang-format
 """,
@@ -110,7 +110,7 @@ exclude = __init__.py
 """,
         pre_commit_config="""
   - repo: https://github.com/pycqa/flake8
-    rev: 7.1.0
+    rev: 7.3.0
     hooks:
       - id: flake8
 """,
@@ -132,7 +132,7 @@ profile=black
 """,
         pre_commit_config="""
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 6.1.0
     hooks:
       - id: isort
         name: isort (python)
@@ -148,17 +148,26 @@ exclude = version.py
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.1
+    rev: v1.18.2
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML==6, types-python-dateutil>=2]
 """,
         rule_type=RuleType.OPT_OUT,
     ),
+    "nbstripout": PreCommitHookMetadata(
+        pre_commit_config="""
+    - repo: https://github.com/kynan/nbstripout
+      rev: v0.8.1
+      hooks:
+        - id: nbstripout
+    """,
+        rule_type=RuleType.OPT_IN,
+    ),
     "pre-commit-hooks": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: check-yaml
         exclude: conda/meta.yaml
@@ -181,7 +190,7 @@ convention = "numpy"
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.5
+    rev: v0.13.3
     hooks:
       - id: ruff
 """,
@@ -190,7 +199,7 @@ convention = "numpy"
     "towncrier": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/twisted/towncrier
-    rev: 23.11.0
+    rev: 25.8.0
     hooks:
       - id: towncrier-check
       """,

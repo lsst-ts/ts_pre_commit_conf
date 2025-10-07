@@ -1,0 +1,1 @@
+Added nbstripout as opt-in hook.
