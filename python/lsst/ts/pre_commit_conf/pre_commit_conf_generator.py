@@ -129,9 +129,7 @@ def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
                 "is not included). This options requires --create to be specified as well."
             )
             if hook_name == "ruff":
-                help_message += (
-                    f" Enabling {hook_name} will disable black, flake8 and isort."
-                )
+                help_message += f" Enabling {hook_name} will disable black, flake8 and isort."
             parser.add_argument(
                 f"--with-{hook_name}",
                 action="store_true",
@@ -196,9 +194,7 @@ def create_or_report_missing_config_file(args: types.SimpleNamespace) -> None:
         else:
             _print_instructions_and_exit(args)
     elif args.create is True:
-        print(
-            f"Config file {TS_PRE_COMMIT_CONFIG_YAML} already exists, no action performed."
-        )
+        print(f"Config file {TS_PRE_COMMIT_CONFIG_YAML} already exists, no action performed.")
         sys.exit(1)
 
 
@@ -295,9 +291,7 @@ def _print_instructions_and_exit(args: types.SimpleNamespace) -> None:
             arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
             message += f"{hook_name}: {'true' if arg else 'false'}\n"
         else:
-            raise RuntimeError(
-                f"Unrecognized hook type: {hook.rule_type!r} for {hook_name}."
-            )
+            raise RuntimeError(f"Unrecognized hook type: {hook.rule_type!r} for {hook_name}.")
     raise FileNotFoundError(message)
 
 
@@ -361,18 +355,14 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
 
     exit_messages = []
     if missing_hooks:
-        exit_messages.append(
-            f"The following pre-commit hooks are missing: {sorted(missing_hooks)}"
-        )
+        exit_messages.append(f"The following pre-commit hooks are missing: {sorted(missing_hooks)}")
     if incorrect_config_options:
         exit_messages.append(
             "The following mandatory pre-commit hooks are "
             + f"not set to 'true': {sorted(incorrect_config_options)}"
         )
     if additional_hooks:
-        exit_messages.append(
-            f"Please remove the following additional lines: {additional_hooks}"
-        )
+        exit_messages.append(f"Please remove the following additional lines: {additional_hooks}")
 
     if missing_hooks or incorrect_config_options or additional_hooks:
         raise ValueError("\n".join(exit_messages))
@@ -494,9 +484,7 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
             arg = getattr(args, f"with_{hook_name.replace('-', '_')}", False)
             pre_commit_config += hook.pre_commit_config if arg else ""
     pre_commit_config_filename = pathlib.Path(dest) / PRE_COMMIT_CONFIG_FILE_NAME
-    _write_pre_commit_config_file(
-        overwrite, pre_commit_config, pre_commit_config_filename
-    )
+    _write_pre_commit_config_file(overwrite, pre_commit_config, pre_commit_config_filename)
 
 
 def _write_pre_commit_config_file(
@@ -550,13 +538,9 @@ def create_config_files(args: types.SimpleNamespace) -> None:
                 case RuleType.MANDATORY:
                     _write_mandatory(hook_name, hook_config_file_name, create_overwrite)
                 case RuleType.OPT_OUT:
-                    _write_opt_in(
-                        args, hook_name, hook_config_file_name, create_overwrite
-                    )
+                    _write_opt_in(args, hook_name, hook_config_file_name, create_overwrite)
                 case RuleType.OPT_IN:
-                    _write_opt_out(
-                        args, hook_name, hook_config_file_name, create_overwrite
-                    )
+                    _write_opt_out(args, hook_name, hook_config_file_name, create_overwrite)
 
 
 def _write_mandatory(
@@ -627,10 +611,7 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
         for hook_name in registry:
             hook = registry[hook_name]
-            if (
-                hook.config_file_name is None
-                or hook.config_file_name in dot_gitignore_contents
-            ):
+            if hook.config_file_name is None or hook.config_file_name in dot_gitignore_contents:
                 continue
             if hook.rule_type == RuleType.MANDATORY and hook.config_file_name:
                 f.write(f"{hook.config_file_name}\n")
