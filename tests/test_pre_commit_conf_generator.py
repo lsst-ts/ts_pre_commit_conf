@@ -31,9 +31,7 @@ import pytest
 import yaml
 from lsst.ts import pre_commit_conf
 
-logging.basicConfig(
-    format="%(asctime)s:%(levelname)s:%(name)s:%(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="%(asctime)s:%(levelname)s:%(name)s:%(message)s", level=logging.DEBUG)
 
 
 class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
@@ -73,16 +71,12 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             args = self.create_args(dest=tmpdirname, create=False, no_mypy=False)
             with pytest.raises(FileNotFoundError):
                 pre_commit_conf.create_or_report_missing_config_file(args=args)
-            config_path = (
-                pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
-            )
+            config_path = pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
             assert not config_path.exists()
 
             args = self.create_args(dest=tmpdirname, create=True, no_mypy=False)
             pre_commit_conf.create_or_report_missing_config_file(args=args)
-            config_path = (
-                pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
-            )
+            config_path = pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
             assert config_path.exists()
             with open(config_path, "r") as f:
                 config = f.read()
@@ -100,9 +94,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_validate_config_file_contents(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdirname:
             args = self.create_args(dest=tmpdirname, create=True, no_mypy=False)
-            config_path = (
-                pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
-            )
+            config_path = pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
             pre_commit_conf.create_or_report_missing_config_file(args=args)
 
             # No error should be raised.
@@ -127,9 +119,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
 
         with tempfile.TemporaryDirectory() as tmpdirname:
             args = self.create_args(dest=tmpdirname, create=True, no_mypy=False)
-            config_path = (
-                pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
-            )
+            config_path = pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
             pre_commit_conf.create_or_report_missing_config_file(args=args)
             # Removing a key should result in an error too.
             with open(config_path, "r") as f:
@@ -151,12 +141,10 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
                 with_ruff=True,
                 with_towncrier=True,
                 with_format_xmllint=True,
-                with_nbstripout=True
+                with_nbstripout=True,
             )
             orig_args = copy(args)
-            config_path = (
-                pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
-            )
+            config_path = pathlib.Path(tmpdirname) / pre_commit_conf.TS_PRE_COMMIT_CONFIG_YAML
             pre_commit_conf.create_or_report_missing_config_file(args=args)
 
             pre_commit_conf.update_args_from_config_file(args)
@@ -171,9 +159,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             pre_commit_conf.update_args_from_config_file(args)
             assert args != orig_args
 
-    def validate_pre_commit_conf(
-        self, expected_hook_names: list[str], **kwargs: bool
-    ) -> None:
+    def validate_pre_commit_conf(self, expected_hook_names: list[str], **kwargs: bool) -> None:
         """Validate the generated .pre-commit-config.yaml file.
 
         Parameters
@@ -196,47 +182,39 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             args.dest = tmpdirname
 
             pre_commit_conf.generate_pre_commit_conf_file(args=args)
-            pre_commit_conf_yaml_file = (
-                pathlib.Path(tmpdirname) / pre_commit_conf.PRE_COMMIT_CONFIG_FILE_NAME
-            )
+            pre_commit_conf_yaml_file = pathlib.Path(tmpdirname) / pre_commit_conf.PRE_COMMIT_CONFIG_FILE_NAME
             with open(pre_commit_conf_yaml_file) as f:
                 generated_conf = f.read()
             for expected_hook_name in expected_hook_names:
                 expected_hook = pre_commit_conf.registry[expected_hook_name]
                 expected_pre_commit_config = expected_hook.pre_commit_config
-                assert (
-                    expected_pre_commit_config in generated_conf
-                ), f"Expected: {expected_pre_commit_config}\n Got: {generated_conf}"
+                assert expected_pre_commit_config in generated_conf, (
+                    f"Expected: {expected_pre_commit_config}\n Got: {generated_conf}"
+                )
             for expected_hook_name in pre_commit_conf.registry:
                 if expected_hook_name not in expected_hook_names:
                     expected_hook = pre_commit_conf.registry[expected_hook_name]
                     expected_pre_commit_config = expected_hook.pre_commit_config
                     arg_prefix = (
                         "no"
-                        if expected_hook.rule_type
-                        == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT
+                        if expected_hook.rule_type == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT
                         else "with"
                     )
                     modifier_flag = kwargs.get(
                         f"{arg_prefix}_{expected_hook_name}",
-                        expected_hook.rule_type
-                        == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT,
+                        expected_hook.rule_type == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT,
                     )
-                    if (
-                        expected_hook.rule_type
-                        == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT
-                    ):
+                    if expected_hook.rule_type == pre_commit_conf.pre_commit_hooks.RuleType.OPT_OUT:
                         modifier_flag = not modifier_flag
                     if (
-                        expected_hook.rule_type
-                        != pre_commit_conf.pre_commit_hooks.RuleType.MANDATORY
+                        expected_hook.rule_type != pre_commit_conf.pre_commit_hooks.RuleType.MANDATORY
                         and not modifier_flag
                     ):
                         assert expected_pre_commit_config not in generated_conf
                     else:
-                        assert (
-                            expected_pre_commit_config in generated_conf
-                        ), f"Expected: {expected_pre_commit_config}\n to be in \n {generated_conf}."
+                        assert expected_pre_commit_config in generated_conf, (
+                            f"Expected: {expected_pre_commit_config}\n to be in \n {generated_conf}."
+                        )
 
     async def test_generate_pre_commit_conf(self) -> None:
         # Nominal case where all pre-commit hooks are included.
@@ -251,9 +229,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             no_mypy=True,
         )
 
-    def validate_config_files(
-        self, expected_hook_names: list[str], **kwargs: bool
-    ) -> None:
+    def validate_config_files(self, expected_hook_names: list[str], **kwargs: bool) -> None:
         """Validate that the copied configuration files for the pre-commit
         hooks are the expected ones both by name and number as well as by
         content.
@@ -299,15 +275,11 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
         for kwargs in (dict(), dict(no_mypy=False)):
             print(kwargs)
             expected_hook_names = ["flake8", "isort", "mypy"]
-            self.validate_config_files(
-                expected_hook_names=expected_hook_names, **kwargs  # type: ignore
-            )
+            self.validate_config_files(expected_hook_names=expected_hook_names, **kwargs)  # type: ignore
 
         # Exclude mypy.
         expected_hook_names = ["flake8", "isort"]
-        self.validate_config_files(
-            expected_hook_names=expected_hook_names, no_mypy=True
-        )
+        self.validate_config_files(expected_hook_names=expected_hook_names, no_mypy=True)
 
     def validate_overwrite(self, **kwargs: bool) -> None:
         """Validate that the existing hook config files are overwritten on not
@@ -326,9 +298,7 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             args.dest = tmpdirname
 
             flake8_hook = pre_commit_conf.registry["flake8"]
-            flake8_hook_config_file_name = (
-                pathlib.Path(tmpdirname) / flake8_hook.config_file_name
-            )
+            flake8_hook_config_file_name = pathlib.Path(tmpdirname) / flake8_hook.config_file_name
             with open(flake8_hook_config_file_name, "w") as f:
                 f.write(flake8_hook.config)
                 # Add an extra line so we can verify whether the file was
@@ -369,40 +339,24 @@ class PrecommitConfGeneratorTestCase(unittest.IsolatedAsyncioTestCase):
             pre_commit_conf.update_dot_gitignore(args=args)
             pre_commit_conf.update_dot_gitignore(args=args)
 
-            dot_gitignore_file = (
-                pathlib.Path(tmpdirname) / pre_commit_conf.DOT_GITIGNORE
-            )
+            dot_gitignore_file = pathlib.Path(tmpdirname) / pre_commit_conf.DOT_GITIGNORE
             with open(dot_gitignore_file) as f:
                 generated_dot_gitignore = f.read()
             for hook_name in pre_commit_conf.registry:
                 if pre_commit_conf.registry[hook_name].config_file_name:
                     include = True
                     hook = pre_commit_conf.registry[hook_name]
-                    if (
-                        hook.rule_type == pre_commit_conf.RuleType.OPT_OUT
-                        and hook.config_file_name
-                    ):
-                        include = not getattr(
-                            args, f"no_{hook_name.replace('-', '_')}", False
-                        )
-                    elif (
-                        hook.rule_type == pre_commit_conf.RuleType.OPT_IN
-                        and hook.config_file_name
-                    ):
-                        include = getattr(
-                            args, f"no_{hook_name.replace('-', '_')}", False
-                        )
+                    if hook.rule_type == pre_commit_conf.RuleType.OPT_OUT and hook.config_file_name:
+                        include = not getattr(args, f"no_{hook_name.replace('-', '_')}", False)
+                    elif hook.rule_type == pre_commit_conf.RuleType.OPT_IN and hook.config_file_name:
+                        include = getattr(args, f"no_{hook_name.replace('-', '_')}", False)
                     if include:
-                        hook_config_file_name = pre_commit_conf.registry[
-                            hook_name
-                        ].config_file_name
+                        hook_config_file_name = pre_commit_conf.registry[hook_name].config_file_name
                         assert hook_config_file_name is not None
                         assert hook_config_file_name in generated_dot_gitignore
                         # Remove the hook config file name to ensure that it
                         # only is included once.
-                        generated_dot_gitignore = generated_dot_gitignore.replace(
-                            hook_config_file_name, ""
-                        )
+                        generated_dot_gitignore = generated_dot_gitignore.replace(hook_config_file_name, "")
                         assert hook_config_file_name not in generated_dot_gitignore
                     else:
                         assert (
