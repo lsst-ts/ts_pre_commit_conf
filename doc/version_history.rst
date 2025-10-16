@@ -8,6 +8,15 @@ Version History
 
 .. towncrier release notes start
 
+v0.9.18 (2025-10-16)
+====================
+
+Performance Enhancement
+-----------------------
+
+- Made sure that the ruff linter and formatter run. (`OSW-1238 <https://rubinobs.atlassian.net//browse/OSW-1238>`_)
+
+
 v0.9.17 (2025-10-07)
 ====================
 
