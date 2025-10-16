@@ -132,7 +132,7 @@ profile=black
 """,
         pre_commit_config="""
   - repo: https://github.com/pycqa/isort
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
       - id: isort
         name: isort (python)
@@ -177,22 +177,25 @@ exclude = version.py
     ),
     "ruff": PreCommitHookMetadata(
         config_file_name=".ruff.toml",
-        config="""ignore = [
-  "E203", "E226", "E228", "E999", "N802", "N803", "N806", "N812", "N813", "N815", "N816"
+        config="""lint.ignore = [
+  "E203", "E226", "E228", "N802", "N803", "N806", "N812", "N813", "N815", "N816"
 ]
 line-length = 110
 exclude = ["__init__.py"]
-select = ["E", "F", "N", "W"]
-[pycodestyle]
+lint.select = ["E", "F", "N", "W"]
+[lint.pycodestyle]
 max-doc-length = 79
-[pydocstyle]
+[lint.pydocstyle]
 convention = "numpy"
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.3
+    rev: v0.14.0
     hooks:
-      - id: ruff
+      # Run the linter.
+      - id: ruff-check
+      # Run the formatter.
+      - id: ruff-format
 """,
         rule_type=RuleType.OPT_IN,
     ),
