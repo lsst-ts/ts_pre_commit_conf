@@ -29,6 +29,7 @@ from copy import copy
 
 import pytest
 import yaml
+
 from lsst.ts import pre_commit_conf
 
 logging.basicConfig(format="%(asctime)s:%(levelname)s:%(name)s:%(message)s", level=logging.DEBUG)
