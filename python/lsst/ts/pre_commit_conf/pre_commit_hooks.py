@@ -182,11 +182,13 @@ exclude = version.py
 ]
 line-length = 110
 exclude = ["__init__.py"]
-lint.select = ["E", "F", "N", "W"]
+lint.select = ["E", "F", "I", "N", "W"]
 [lint.pycodestyle]
 max-doc-length = 79
 [lint.pydocstyle]
 convention = "numpy"
+[lint.isort]
+known-first-party = ["lsst"]
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
