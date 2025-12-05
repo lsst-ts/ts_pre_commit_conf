@@ -8,6 +8,21 @@ Version History
 
 .. towncrier release notes start
 
+v0.9.20 (2025-12-05)
+====================
+
+Bug Fixes
+---------
+
+- Made ruff auto fix imports. (`OSW-1554 <https://rubinobs.atlassian.net//browse/OSW-1554>`_)
+
+
+Performance Enhancement
+-----------------------
+
+- Updated all hook versions. (`OSW-1554 <https://rubinobs.atlassian.net//browse/OSW-1554>`_)
+
+
 v0.9.19 (2025-12-03)
 ====================
 
