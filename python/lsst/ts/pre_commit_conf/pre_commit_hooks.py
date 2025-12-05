@@ -196,6 +196,7 @@ known-first-party = ["lsst"]
     hooks:
       # Run the linter.
       - id: ruff-check
+        args: [ --fix ]
       # Run the formatter.
       - id: ruff-format
 """,
