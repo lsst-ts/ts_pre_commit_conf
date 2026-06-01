@@ -75,7 +75,7 @@ registry = {
     "black": PreCommitHookMetadata(
         pre_commit_config="""
   - repo: https://github.com/psf/black
-    rev: 25.11.0
+    rev: 26.5.1
     hooks:
       - id: black
 """,
@@ -94,7 +94,7 @@ ContinuationIndentWidth: 8
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v21.1.7
+    rev: v22.1.5
     hooks:
       - id: clang-format
 """,
@@ -132,7 +132,7 @@ profile=black
 """,
         pre_commit_config="""
   - repo: https://github.com/pycqa/isort
-    rev: 7.0.0
+    rev: 8.0.1
     hooks:
       - id: isort
         name: isort (python)
@@ -148,7 +148,7 @@ exclude = version.py
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.0
+    rev: v2.1.0
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML==6, types-python-dateutil>=2]
@@ -158,7 +158,7 @@ exclude = version.py
     "nbstripout": PreCommitHookMetadata(
         pre_commit_config="""
     - repo: https://github.com/kynan/nbstripout
-      rev: v0.8.2
+      rev: v0.9.1
       hooks:
         - id: nbstripout
     """,
@@ -192,7 +192,7 @@ known-first-party = ["lsst"]
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.8
+    rev: v0.15.15
     hooks:
       # Run the linter.
       - id: ruff-check
