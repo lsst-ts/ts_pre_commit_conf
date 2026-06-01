@@ -8,6 +8,15 @@ Version History
 
 .. towncrier release notes start
 
+v0.9.21 (2026-06-01)
+====================
+
+Performance Enhancement
+-----------------------
+
+- Updated pre-commit hook versions. (`OSW-2189 <https://rubinobs.atlassian.net//browse/OSW-2189>`_)
+
+
 v0.9.20 (2025-12-05)
 ====================
 
