@@ -1,6 +1,6 @@
 # This file is part of ts_pre_commit_conf.
 #
-# Developed for the Vera Rubin Observatory Telescope and Site Systems.
+# Developed for the Vera C. Rubin Observatory Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -13,11 +13,11 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 __all__ = ["registry", "RuleType"]
 
@@ -31,7 +31,7 @@ class RuleType(enum.Enum):
     OPT_OUT = enum.auto()
 
 
-@dataclass(eq=True, frozen=True)
+@dataclass(eq=True)
 class PreCommitHookMetadata:
     """Dataclass representing all metadata for a pre-commit hook.
 
@@ -124,6 +124,23 @@ exclude = __init__.py
       - id: format-xmllint
 """,
         rule_type=RuleType.OPT_IN,
+    ),
+    "insert-license": PreCommitHookMetadata(
+        pre_commit_config="""
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.6
+    hooks:
+      - id: insert-license
+        files: \\.(py)
+        args:
+        - --license-filepath=.LICENSE.txt
+      - id: insert-license
+        files: (cpp)|(c)$
+        args:
+          - --license-filepath=.LICENSE.txt
+          - --comment-style="/*| *| */"
+      """,
+        rule_type=RuleType.MANDATORY,
     ),
     "isort": PreCommitHookMetadata(
         config_file_name=".isort.cfg",
