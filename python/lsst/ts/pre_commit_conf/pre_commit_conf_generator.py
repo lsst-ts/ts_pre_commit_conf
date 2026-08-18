@@ -1,6 +1,6 @@
 # This file is part of ts_pre_commit_conf.
 #
-# Developed for the Vera Rubin Observatory Telescope and Site Systems.
+# Developed for the Vera C. Rubin Observatory Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -13,11 +13,11 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 __all__ = [
     "DOT_GITIGNORE",
@@ -43,6 +43,7 @@ import shutil
 import sys
 import types
 
+import tomllib
 import yaml
 
 from .pre_commit_hooks import RuleType, registry
@@ -59,6 +60,39 @@ DOT_GITIGNORE = ".gitignore"
 
 # Process timeout (sec)
 PROCESS_TIMEOUT = 5
+
+# Load pyproject.toml to get the project name.
+p = pathlib.Path(__file__).parent
+while not (p / "pyproject.toml").exists():
+    p = p.parent
+
+with open(p / "pyproject.toml", "rb") as f:
+    data = tomllib.load(f)
+PROJECT_NAME = data["project"]["name"]
+
+LICENSE_FILE = ".LICENSE.txt"
+
+LICENSE_CONTENTS = """This file is part of {}.
+
+Developed for the Vera C. Rubin Observatory Telescope and Site Systems.
+This product includes software developed by the LSST Project
+(https://www.lsst.org).
+See the COPYRIGHT file at the top-level directory of this distribution
+for details of code ownership.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+""".format(PROJECT_NAME)
 
 
 def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
@@ -196,6 +230,13 @@ def create_or_report_missing_config_file(args: types.SimpleNamespace) -> None:
     elif args.create is True:
         print(f"Config file {TS_PRE_COMMIT_CONFIG_YAML} already exists, no action performed.")
         sys.exit(1)
+
+
+def create_license_file(args: types.SimpleNamespace) -> None:
+    dest = _get_dest(args=args)
+    license_path = dest / LICENSE_FILE
+    print(f"Creating license file at {str(license_path)}.")
+    license_path.write_text(LICENSE_CONTENTS)
 
 
 def determine_arg(args: types.SimpleNamespace, hook_name: str) -> bool:
@@ -475,6 +516,7 @@ def generate_pre_commit_conf_file(args: types.SimpleNamespace) -> None:
             continue
 
         hook = registry[hook_name]
+
         if hook.rule_type == RuleType.MANDATORY:
             pre_commit_config += hook.pre_commit_config
         elif hook.rule_type == RuleType.OPT_OUT:
@@ -609,6 +651,8 @@ def update_dot_gitignore(args: types.SimpleNamespace) -> None:
             f.write("\n")
         if PRE_COMMIT_CONFIG_FILE_NAME not in dot_gitignore_contents:
             f.write(f"{PRE_COMMIT_CONFIG_FILE_NAME}\n")
+        if LICENSE_FILE not in dot_gitignore_contents:
+            f.write(f"{LICENSE_FILE}\n")
         for hook_name in registry:
             hook = registry[hook_name]
             if hook.config_file_name is None or hook.config_file_name in dot_gitignore_contents:
@@ -689,6 +733,7 @@ def generate_pre_commit_conf() -> None:
     except (ValueError, FileNotFoundError) as e:
         sys.exit(str(e))
     update_args_from_config_file(args=args)
+    create_license_file(args=args)
     generate_pre_commit_conf_file(args=args)
     create_config_files(args=args)
     update_dot_gitignore(args=args)
