@@ -94,7 +94,7 @@ ContinuationIndentWidth: 8
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v22.1.5
+    rev: v22.1.8
     hooks:
       - id: clang-format
 """,
@@ -165,7 +165,7 @@ exclude = version.py
 """,
         pre_commit_config="""
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
+    rev: v2.3.1
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML==6, types-python-dateutil>=2]
@@ -209,7 +209,7 @@ known-first-party = ["lsst"]
 """,
         pre_commit_config="""
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.15
+    rev: v0.16.3
     hooks:
       # Run the linter.
       - id: ruff-check
