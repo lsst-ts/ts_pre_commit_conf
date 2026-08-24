@@ -42,6 +42,7 @@ import pathlib
 import shutil
 import sys
 import types
+import typing
 
 import tomllib
 import yaml
@@ -50,16 +51,16 @@ from .pre_commit_hooks import RuleType, registry
 
 # The YAML file holding the configuration for the "generate_pre_commit_conf"
 # command.
-TS_PRE_COMMIT_CONFIG_YAML = ".ts_pre_commit_config.yaml"
+TS_PRE_COMMIT_CONFIG_YAML: typing.Final[str] = ".ts_pre_commit_config.yaml"
 
 # The YAML file holding the configurations for the pre-commit hooks.
-PRE_COMMIT_CONFIG_FILE_NAME = ".pre-commit-config.yaml"
+PRE_COMMIT_CONFIG_FILE_NAME: typing.Final[str] = ".pre-commit-config.yaml"
 
 # The Git ignore file.
-DOT_GITIGNORE = ".gitignore"
+DOT_GITIGNORE: typing.Final[str] = ".gitignore"
 
 # Process timeout (sec)
-PROCESS_TIMEOUT = 5
+PROCESS_TIMEOUT: typing.Final[int] = 5
 
 # Load pyproject.toml to get the project name.
 p = pathlib.Path(__file__).parent
@@ -68,11 +69,11 @@ while not (p / "pyproject.toml").exists():
 
 with open(p / "pyproject.toml", "rb") as f:
     data = tomllib.load(f)
-PROJECT_NAME = data["project"]["name"]
+PROJECT_NAME: typing.Final[str] = data["project"]["name"]
 
-LICENSE_FILE = ".LICENSE.txt"
+LICENSE_FILE: typing.Final[str] = ".LICENSE.txt"
 
-LICENSE_CONTENTS = """This file is part of {}.
+LICENSE_CONTENTS: typing.Final[str] = """This file is part of {}.
 
 Developed for the Vera C. Rubin Observatory Telescope and Site Systems.
 This product includes software developed by the LSST Project
