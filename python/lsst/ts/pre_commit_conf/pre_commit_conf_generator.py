@@ -63,17 +63,15 @@ DOT_GITIGNORE: typing.Final[str] = ".gitignore"
 PROCESS_TIMEOUT: typing.Final[int] = 5
 
 # Load pyproject.toml to get the project name.
-p = pathlib.Path(__file__).parent
-while not (p / "pyproject.toml").exists():
-    p = p.parent
-
+# This assumes the `pre-commit` command is run from the project root.
+p = pathlib.Path().cwd()
 with open(p / "pyproject.toml", "rb") as f:
     data = tomllib.load(f)
 PROJECT_NAME: typing.Final[str] = data["project"]["name"]
 
 LICENSE_FILE: typing.Final[str] = ".LICENSE.txt"
 
-LICENSE_CONTENTS: typing.Final[str] = """This file is part of {}.
+LICENSE_CONTENTS: typing.Final[str] = f"""This file is part of {PROJECT_NAME}.
 
 Developed for the Vera C. Rubin Observatory Telescope and Site Systems.
 This product includes software developed by the LSST Project
@@ -93,7 +91,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
-""".format(PROJECT_NAME)
+"""
 
 
 def parse_args(command_line_args: list[str]) -> types.SimpleNamespace:
