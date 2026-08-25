@@ -8,6 +8,23 @@ Version History
 
 .. towncrier release notes start
 
+v0.10.0 (2026-08-25)
+====================
+
+New Features
+------------
+
+- Added a hook to check the presence of license headers in Python, C and C++ files. (`OSW-2831 <https://rubinobs.atlassian.net//browse/OSW-2831>`_)
+
+
+Performance Enhancement
+-----------------------
+
+- Updated the version of serveral hooks. (`OSW-2831 <https://rubinobs.atlassian.net//browse/OSW-2831>`_)
+- Marked all constants Final. (`OSW-2862 <https://rubinobs.atlassian.net//browse/OSW-2862>`_)
+- Fixed determining the project name. (`OSW-2862 <https://rubinobs.atlassian.net//browse/OSW-2862>`_)
+
+
 v0.9.21 (2026-06-01)
 ====================
 
