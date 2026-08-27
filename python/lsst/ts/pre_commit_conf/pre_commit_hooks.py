@@ -138,7 +138,7 @@ exclude = __init__.py
         files: \\.(cpp|c)$
         args:
           - --license-filepath=.LICENSE.txt
-          - --comment-style="/*| *| */"
+          - --comment-style=/*| *| */
       """,
         rule_type=RuleType.MANDATORY,
     ),
