@@ -1,0 +1,1 @@
+Fixed spurious quotation marks that appear in the C/C++ license headers.
