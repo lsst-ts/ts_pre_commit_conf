@@ -135,7 +135,7 @@ exclude = __init__.py
         args:
         - --license-filepath=.LICENSE.txt
       - id: insert-license
-        files: (cpp)|(c)$
+        files: \\.(cpp|c)$
         args:
           - --license-filepath=.LICENSE.txt
           - --comment-style="/*| *| */"
