@@ -8,6 +8,16 @@ Version History
 
 .. towncrier release notes start
 
+v0.10.1 (2026-08-27)
+====================
+
+Bug Fixes
+---------
+
+- Fixed regex in cpp/c license-insert to only check for .cpp or .c files rather than files with cpp or c in the file name. (`OSW-2877 <https://rubinobs.atlassian.net//browse/OSW-2877>`_)
+- Fixed spurious quotation marks that appear in the C/C++ license headers. (`OSW-2879 <https://rubinobs.atlassian.net//browse/OSW-2879>`_)
+
+
 v0.10.0 (2026-08-25)
 ====================
 
