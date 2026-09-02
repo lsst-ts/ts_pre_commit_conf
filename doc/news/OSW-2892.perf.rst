@@ -1,0 +1,1 @@
+Fixed determining the project name without the need for a pyproject.toml file.

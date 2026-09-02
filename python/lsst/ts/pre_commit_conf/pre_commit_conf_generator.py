@@ -43,9 +43,10 @@ import shutil
 import sys
 import types
 import typing
+from os.path import basename
 
-import tomllib
 import yaml
+from git import Repo
 
 from .pre_commit_hooks import RuleType, registry
 
@@ -65,9 +66,8 @@ PROCESS_TIMEOUT: typing.Final[int] = 5
 # Load pyproject.toml to get the project name.
 # This assumes the `pre-commit` command is run from the project root.
 p = pathlib.Path().cwd()
-with open(p / "pyproject.toml", "rb") as f:
-    data = tomllib.load(f)
-PROJECT_NAME: typing.Final[str] = data["project"]["name"]
+repo = Repo(p)
+PROJECT_NAME: typing.Final[str] = basename(repo.remotes.origin.url).replace(".git", "")
 
 LICENSE_FILE: typing.Final[str] = ".LICENSE.txt"
 
