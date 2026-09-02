@@ -139,6 +139,11 @@ exclude = __init__.py
         args:
           - --license-filepath=.LICENSE.txt
           - --comment-style=/*| *| */
+      - id: insert-license
+        files: \\.(rs)$
+        args:
+          - --license-filepath=.LICENSE.txt
+          - --comment-style=//
       """,
         rule_type=RuleType.MANDATORY,
     ),
