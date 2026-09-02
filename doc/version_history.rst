@@ -8,6 +8,16 @@ Version History
 
 .. towncrier release notes start
 
+v0.10.2 (2026-09-02)
+====================
+
+Performance Enhancement
+-----------------------
+
+- Added support for checking the license header of Rust files. (`OSW-2892 <https://rubinobs.atlassian.net//browse/OSW-2892>`_)
+- Fixed determining the project name without the need for a pyproject.toml file. (`OSW-2892 <https://rubinobs.atlassian.net//browse/OSW-2892>`_)
+
+
 v0.10.1 (2026-08-27)
 ====================
 
