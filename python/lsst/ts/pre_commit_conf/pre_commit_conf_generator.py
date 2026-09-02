@@ -45,6 +45,7 @@ import types
 import typing
 from os.path import basename
 
+import git.exc
 import yaml
 from git import Repo
 
@@ -66,8 +67,11 @@ PROCESS_TIMEOUT: typing.Final[int] = 5
 # Load pyproject.toml to get the project name.
 # This assumes the `pre-commit` command is run from the project root.
 p = pathlib.Path().cwd()
-repo = Repo(p)
-PROJECT_NAME: typing.Final[str] = basename(repo.remotes.origin.url).replace(".git", "")
+try:
+    repo = Repo(p)
+    PROJECT_NAME: str = basename(repo.remotes.origin.url).replace(".git", "")
+except git.exc.InvalidGitRepositoryError:
+    PROJECT_NAME = "unknown"
 
 LICENSE_FILE: typing.Final[str] = ".LICENSE.txt"
 
@@ -240,7 +244,7 @@ def create_license_file(args: types.SimpleNamespace) -> None:
 
 def determine_arg(args: types.SimpleNamespace, hook_name: str) -> bool:
     # If the rule is opt-out, the arg name prefix is "no"; if the rule
-    # is opt-in it is "with".
+    # is opt-in, it is "with".
     hook = registry[hook_name]
     hook_arg_name_prefix = "no" if hook.rule_type == RuleType.OPT_OUT else "with"
     arg = getattr(
@@ -349,7 +353,7 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
         ruff
         towncrier
 
-    Either black, flake8 and isort are mandatory or ruff.
+    Either black, flake8, and isort are mandatory or ruff.
 
     Parameters
     ----------
@@ -359,15 +363,15 @@ def validate_config_file_contents(args: types.SimpleNamespace) -> None:
     Raises
     ------
     ValueError
-        In case of incorrect, missing or not allowed pre-commit hook config
+        In case of incorrect, missing, or not allowed pre-commit hook config
         options.
 
     Notes
     -----
-    The script will fail with a comprehensive error message if any of the
-    pre-commit hooks used by TSSW are missing, if any of the mandatory
-    pre-commit hooks are set to "no" or if any additional pre-commit hooks
-    (meaning any non-empty line that is not a comment) is present.
+    The script fails with a comprehensive error message if any of the
+    pre-commit hooks used by TSSW are missing. It also fails if any of the
+    mandatory pre-commit hooks are set to "no" or if any additional pre-commit
+    hooks (meaning any non-empty line that is not a comment) are present.
     """
     dest = _get_dest(args=args)
     with open(dest / TS_PRE_COMMIT_CONFIG_YAML) as f:
