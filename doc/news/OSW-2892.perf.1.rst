@@ -1,0 +1,1 @@
+Added support for checking the license header of Rust files.
